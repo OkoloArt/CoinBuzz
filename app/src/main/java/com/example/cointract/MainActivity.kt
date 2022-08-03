@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -34,7 +35,15 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_home), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+      //  navView.setupWithNavController(navController)
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Handle menu item selected
+           if (menuItem.itemId == R.id.nav_settings){
+               Toast.makeText(this,"Settings",Toast.LENGTH_SHORT).show()
+           }
+            drawerLayout.close()
+            true
+        }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.splashFragment -> {
@@ -45,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                         //doSomethingHere()
                         supportActionBar?.show()
                         supportActionBar?.title = null
+                        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_indicator_person)
                     }, 0)
 
                 }

@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.SplashFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- TODO: Update blank fragment layout -->
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/goToNxt"
+    <data>
+
+        <variable
+            name="splashFragment"
+            type="com.example.cointract.ui.SplashFragment" />
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent"
+        tools:context=".ui.SplashFragment">
 
-</FrameLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/splash_image"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/crypto" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:id="@+id/splash_intro_text"
+            android:text="@string/intro_text"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splash_image" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:onClick="@{() -> splashFragment.goToNextScreen()}"
+            android:layout_below="@id/splash_intro_text"
+            android:layout_height="wrap_content"
+            android:text="Get Started" />
+
+    </RelativeLayout>
+</layout>

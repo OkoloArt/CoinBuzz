@@ -35,9 +35,12 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.goToNxt.setOnClickListener {
-            findNavController().navigate(R.id.action_splashFragment_to_nav_home)
-        }
+       binding.apply {
+           splashFragment = this@SplashFragment
+       }
+    }
 
+    fun goToNextScreen(){
+        findNavController().navigate(R.id.action_splashFragment_to_nav_home)
     }
 }
