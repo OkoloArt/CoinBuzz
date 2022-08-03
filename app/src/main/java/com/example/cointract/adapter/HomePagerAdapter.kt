@@ -9,8 +9,6 @@ import com.example.cointract.ui.ExchangeFragment
 class HomePagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
 
-
-
     override fun getItemCount(): Int {
         return 2
     }
