@@ -1,24 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="50dp"
         android:id="@+id/asset_icon"
-        app:srcCompat="@drawable/bitcoin"
-        android:layout_height="60dp"/>
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/bitcoin" />
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_toEndOf="@id/asset_icon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/asset_icon"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Bitcoin" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_priceUsd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$22,807.63" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/asset_indicator"
+                android:layout_width="18dp"
+                android:layout_height="30dp"
+                app:srcCompat="@drawable/arrow_up" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_change24hr"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0.33%" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_marketCap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MCap $435.87Bn" />
 
         </LinearLayout>
 

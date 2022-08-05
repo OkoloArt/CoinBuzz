@@ -8,3 +8,14 @@ plugins {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+// Define versions in a single place
+ext {
+    retrofit_version = '2.4.0'
+    lifecycle_version = '2.4.1'
+    gson_version = '2.3.0'
+    circular_version = '3.1.0'
+    nav_version = '2.3.5'
+    koin_version = '3.2.0'
+    picasso_version = '2.71828'
+}

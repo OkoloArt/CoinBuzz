@@ -1,0 +1,24 @@
+package com.example.cointract.model
+
+import com.google.gson.annotations.SerializedName
+
+data class AssetResults(
+
+    @SerializedName("id")
+    val assetId: String,
+
+    @SerializedName("name")
+    val assetName: String,
+
+    @SerializedName("priceUsd")
+    val assetPriceUsd: String,
+
+    @SerializedName("rank")
+    val assetRank: String,
+
+    @SerializedName("changePercent24Hr")
+    val assetChange24Hr: String,
+
+    @SerializedName("marketCapUsd")
+    val assetMCap: String,
+)
