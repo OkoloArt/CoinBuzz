@@ -39,4 +39,10 @@ data class SingleAsset(
     @SerializedName("symbol")
     val assetSymbol: String,
 
+    @SerializedName("marketCapUsd")
+    val assetMCap: String,
+
+    @SerializedName("volumeUsd24Hr")
+    val assetVolumeUsd24Hr: String,
+
 )

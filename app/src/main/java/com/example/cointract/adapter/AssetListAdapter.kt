@@ -42,7 +42,7 @@ class AssetListAdapter :
                 number > 0 && number < 1 -> {
                     nNoPattern.format(number)
                 }
-                else -> pattern.format(number)
+                else -> pattern.format(number).toDouble().toString()
             }
         }
 

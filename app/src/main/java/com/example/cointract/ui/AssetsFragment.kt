@@ -1,10 +1,16 @@
 package com.example.cointract.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
@@ -13,13 +19,14 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.AssetList
 import com.example.cointract.model.AssetSingle
 import com.example.cointract.model.AssetsList
-import com.example.cointract.model.SingleAsset
 import com.example.cointract.network.AssetApiInterface
 import com.example.cointract.network.RetrofitInstance.retrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
@@ -34,6 +41,15 @@ class AssetsFragment : Fragment() {
     private lateinit var adapter: AssetListAdapter
     var assetsResultList = mutableListOf<AssetList>(
     )
+
+    private var priceUsd = ""
+    private var marketCap = ""
+    private var change24H = ""
+    private var volume24H = ""
+
+    private val numberFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
+    private val symbol = numberFormat.currency?.symbol
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +66,7 @@ class AssetsFragment : Fragment() {
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
+
     }
 
     private fun retrieveAssetListJson() {
@@ -62,7 +79,7 @@ class AssetsFragment : Fragment() {
 
                     assetsResultList.clear()
                     assetsResultList = response.body()?.data as MutableList<AssetList>
-
+                    assetsResultList.subList(0, 2).clear()
                     adapter = AssetListAdapter()
                     adapter.submitList(assetsResultList)
                     binding.assetsListRecyclerview.layoutManager = LinearLayoutManager(
@@ -95,12 +112,23 @@ class AssetsFragment : Fragment() {
                                 "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
                             binding.leftAssetPriceUsd.text =
                                 roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
+                            priceUsd =
+                                "Price ${roundOffPriceUsd(response.body()!!.data.assetPriceUsd)}"
+                            marketCap =
+                                "MCap ${roundOffMCap(response.body()!!.data.assetMCap)}"
+                            change24H =
+                                "Change24H ${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
+                            volume24H =
+                                "Volume24h ${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
+                            setUpTextSwitcher()
                         }
                         "ethereum" -> {
                             binding.rightAssetName.text = response.body()!!.data.assetName
                             binding.rightAssetSymbol.text = response.body()!!.data.assetSymbol
-                            binding.rightAssetChange24Hr.text =  "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
-                            binding.rightAssetPriceUsd.text = roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
+                            binding.rightAssetChange24Hr.text =
+                                "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
+                            binding.rightAssetPriceUsd.text =
+                                roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
                             binding.rightAssetIcon.setImageResource(R.drawable.ethereum)
                         }
                     }
@@ -122,6 +150,44 @@ class AssetsFragment : Fragment() {
         val number = num.toFloat()
         val pattern = DecimalFormat("###.##")
         return pattern.format(number).toDouble()
+    }
+
+    private fun setUpTextSwitcher() {
+        val bitcoinData = arrayOf(priceUsd, marketCap,change24H,volume24H)
+        var index = 0
+        binding.textSwitcher.setFactory {
+            val textView = TextView(requireContext())
+            textView.gravity = Gravity.CENTER_HORIZONTAL
+            textView.textSize = 20f
+            textView.setTextColor(Color.WHITE)
+            textView
+        }
+        val textIn = AnimationUtils.loadAnimation(
+            requireContext(), android.R.anim.slide_in_left)
+
+        val textOut = AnimationUtils.loadAnimation(
+            requireContext(), android.R.anim.slide_out_right)
+
+        binding.textSwitcher.apply {
+            setText(bitcoinData[index])
+            inAnimation = textIn
+            outAnimation = textOut
+        }
+
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                Handler(Looper.getMainLooper()).post {
+                    index = if (index + 1 < bitcoinData.size) index + 1 else 0
+                    binding.textSwitcher.setText(bitcoinData[index])
+                }
+            }
+        }, 0, 5000)
+    }
+
+    private fun roundOffMCap(num: String): String {
+        val number = num.toFloat()
+        val pattern = DecimalFormat("###,###,###,###")
+        return "$symbol${pattern.format(number)}"
     }
 
     companion object {

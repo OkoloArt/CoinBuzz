@@ -10,12 +10,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/layoutTop"
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:background="@color/black"
-        android:orientation="horizontal" />
+        <LinearLayout
+            android:id="@+id/layoutTop"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="@color/black"
+            android:orientation="vertical" >
+
+            <TextSwitcher
+                android:layout_marginTop="40dp"
+                android:id="@+id/textSwitcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dummy_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:gravity="center_horizontal"
+                android:text="Bitcoin"/>
+
+
+
+        </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/overlapImage"
