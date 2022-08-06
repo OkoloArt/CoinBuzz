@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
 import com.example.cointract.adapter.AssetListAdapter
@@ -19,6 +20,7 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.AssetList
 import com.example.cointract.model.AssetSingle
 import com.example.cointract.model.AssetsList
+import com.example.cointract.model.CoinViewModel
 import com.example.cointract.network.AssetApiInterface
 import com.example.cointract.network.RetrofitInstance.retrofitInstance
 import retrofit2.Call
@@ -42,6 +44,8 @@ class AssetsFragment : Fragment() {
     var assetsResultList = mutableListOf<AssetList>(
     )
 
+    private val coinViewModel: CoinViewModel by activityViewModels()
+
     private var priceUsd = ""
     private var marketCap = ""
     private var change24H = ""
@@ -63,10 +67,18 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        adapter = AssetListAdapter()
+
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
         retrieveAssetSingleJson(TETHER)
+
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                retrieveAssetListJson()
+            }
+        }, 0, 5000)
     }
 
     private fun retrieveAssetListJson() {
