@@ -2,6 +2,7 @@ package com.example.cointract.network
 
 import com.example.cointract.model.AssetSingle
 import com.example.cointract.model.AssetsList
+import com.example.cointract.model.Exchanges
 import com.example.cointract.model.SingleAsset
 import retrofit2.Call
 import retrofit2.http.GET
@@ -18,4 +19,8 @@ interface AssetApiInterface {
     fun getAssetSingle(
         @Path("id") assetId: String
     ): Call<AssetSingle?>
+
+    @GET("exchanges")
+    fun getExchangeList(
+    ): Call<Exchanges?>
 }

@@ -66,7 +66,7 @@ class AssetsFragment : Fragment() {
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
-
+        retrieveAssetSingleJson(TETHER)
     }
 
     private fun retrieveAssetListJson() {
@@ -79,7 +79,7 @@ class AssetsFragment : Fragment() {
 
                     assetsResultList.clear()
                     assetsResultList = response.body()?.data as MutableList<AssetList>
-                    assetsResultList.subList(0, 2).clear()
+                    assetsResultList.subList(0, 3).clear()
                     adapter = AssetListAdapter()
                     adapter.submitList(assetsResultList)
                     binding.assetsListRecyclerview.layoutManager = LinearLayoutManager(
@@ -105,13 +105,6 @@ class AssetsFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
                     when (assetId) {
                         "bitcoin" -> {
-                            binding.leftAssetIcon.setImageResource(R.drawable.bitcoin)
-                            binding.leftAssetName.text = response.body()!!.data.assetName
-                            binding.leftAssetSymbol.text = response.body()!!.data.assetSymbol
-                            binding.leftAssetChange24Hr.text =
-                                "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
-                            binding.leftAssetPriceUsd.text =
-                                roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
                             priceUsd =
                                 "Price ${roundOffPriceUsd(response.body()!!.data.assetPriceUsd)}"
                             marketCap =
@@ -123,13 +116,22 @@ class AssetsFragment : Fragment() {
                             setUpTextSwitcher()
                         }
                         "ethereum" -> {
+                            binding.leftAssetIcon.setImageResource(R.drawable.ethereum)
+                            binding.leftAssetName.text = response.body()!!.data.assetName
+                            binding.leftAssetSymbol.text = response.body()!!.data.assetSymbol
+                            binding.leftAssetChange24Hr.text =
+                                "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
+                            binding.leftAssetPriceUsd.text =
+                                roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
+                        }
+                        "tether" -> {
                             binding.rightAssetName.text = response.body()!!.data.assetName
                             binding.rightAssetSymbol.text = response.body()!!.data.assetSymbol
                             binding.rightAssetChange24Hr.text =
                                 "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
                             binding.rightAssetPriceUsd.text =
                                 roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
-                            binding.rightAssetIcon.setImageResource(R.drawable.ethereum)
+                            binding.rightAssetIcon.setImageResource(R.drawable.tether)
                         }
                     }
                 }
@@ -143,7 +145,7 @@ class AssetsFragment : Fragment() {
     private fun roundOffPriceUsd(num: String): String {
         val number = num.toFloat()
         val pattern = DecimalFormat("###.##")
-        return pattern.format(number)
+        return "$symbol${pattern.format(number).toDouble()}"
     }
 
     private fun roundOffChange24Hr(num: String): Double {
@@ -153,7 +155,7 @@ class AssetsFragment : Fragment() {
     }
 
     private fun setUpTextSwitcher() {
-        val bitcoinData = arrayOf(priceUsd, marketCap,change24H,volume24H)
+        val bitcoinData = arrayOf(priceUsd, marketCap, change24H, volume24H)
         var index = 0
         binding.textSwitcher.setFactory {
             val textView = TextView(requireContext())
@@ -193,5 +195,6 @@ class AssetsFragment : Fragment() {
     companion object {
         private const val BITCOIN = "bitcoin"
         private const val ETHEREUM = "ethereum"
+        private const val TETHER = "tether"
     }
 }
