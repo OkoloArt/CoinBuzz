@@ -45,7 +45,16 @@ data class SingleAsset(
     @SerializedName("volumeUsd24Hr")
     val assetVolumeUsd24Hr: String,
 
-)
+    @SerializedName("maxSupply")
+    val assetMaxSupply: String,
+
+    @SerializedName("supply")
+    val assetCirculatingSupply: String,
+
+    @SerializedName("rank")
+    val assetRank: String,
+
+    )
 
 data class ExchangeList(
 
@@ -66,4 +75,4 @@ data class ExchangeList(
 
     @SerializedName("exchangeUrl")
     val exchangeUrl: String,
-    )
+)

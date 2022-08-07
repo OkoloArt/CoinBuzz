@@ -14,7 +14,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-class AssetListAdapter :
+class AssetListAdapter( private val onItemClicked: (AssetList) -> Unit ) :
     ListAdapter<AssetList, AssetListAdapter.AssetListViewHolder>(DiffCallback) {
 
     class AssetListViewHolder(private val binding: AssetsListDetailBinding) :
@@ -89,10 +89,11 @@ class AssetListAdapter :
 
     override fun onBindViewHolder(holder: AssetListViewHolder, position: Int) {
         val current = getItem(position)
+        holder.itemView.setOnClickListener {
+            onItemClicked(current)
+        }
         holder.bind(current)
     }
-
-    //   override fun getItemCount() = dataSet.size
 
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<AssetList>() {

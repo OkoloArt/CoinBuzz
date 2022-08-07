@@ -13,6 +13,7 @@ import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
 import com.example.cointract.adapter.AssetListAdapter
@@ -67,8 +68,6 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = AssetListAdapter()
-
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
@@ -92,7 +91,10 @@ class AssetsFragment : Fragment() {
                     assetsResultList.clear()
                     assetsResultList = response.body()?.data as MutableList<AssetList>
                     assetsResultList.subList(0, 3).clear()
-                    adapter = AssetListAdapter()
+                    adapter = AssetListAdapter{
+                        coinViewModel.setAssetId(it.assetId)
+                        findNavController().navigate(R.id.action_nav_home_to_detailFragment)
+                    }
                     adapter.submitList(assetsResultList)
                     binding.assetsListRecyclerview.layoutManager = LinearLayoutManager(
                         requireContext(),

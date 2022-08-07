@@ -1,14 +1,205 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.DetailFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/title_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-</FrameLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="OverView" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Markets" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/asset_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_layout"
+        android:text="Bitcoin" />
+
+    <LinearLayout
+        android:layout_below="@id/asset_name"
+        android:layout_width="match_parent"
+        android:id="@+id/asset_change"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:id="@+id/asset_priceUsd"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="$20,000" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:id="@+id/asset_change24hr"
+            android:layout_height="wrap_content"
+            android:text="7.64%" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/time_frame"
+        android:layout_below="@id/asset_change"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:id="@+id/one_hour"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="1h" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:id="@+id/four_hours"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="4h%" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/eight_hours"
+            android:layout_height="wrap_content"
+            android:text="8h" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:id="@+id/one_day"
+            android:layout_height="wrap_content"
+            android:text="1d" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/candle_data"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_below="@id/time_frame" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/statistics_text"
+        android:text="Statistics"
+        android:layout_below="@id/candle_data"/>
+
+    <LinearLayout
+        android:id="@+id/statistics_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/statistics_text"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Market Cap" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:id="@+id/asset_marketCap"
+                android:layout_height="wrap_content"
+                android:text="4h%" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volume 24h" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:id="@+id/asset_volume24h"
+                android:layout_height="wrap_content"
+                android:text="1d" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Max Supply" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:id="@+id/asset_max_supply"
+                android:layout_height="wrap_content"
+                android:text="4h%" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="3dp"
+            android:background="?android:attr/listDivider"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Circulating Supply" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/asset_circulating_supply"
+                android:text="4h%" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price Change 24h" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_statistics_change24hr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1d" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rank" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/asset_rank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4h%" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/explore"
+        android:layout_below="@id/statistics_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Learn More"/>
+</RelativeLayout>
