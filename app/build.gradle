@@ -65,12 +65,10 @@ dependencies {
 
     // Chart Data
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.PhilJay:MPAndroidChart-Realm:v3.0.3@aar'
 
     // Koin for Android
     implementation "io.insert-koin:koin-android:$koin_version"
     // Testing
     testImplementation "io.insert-koin:koin-test:$koin_version"
-
-    // Material Design
-    implementation "com.google.android.material:material:1.7.0-alpha02"
 }

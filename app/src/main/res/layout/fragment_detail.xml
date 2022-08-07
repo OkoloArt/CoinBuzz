@@ -88,10 +88,10 @@
             android:text="1d" />
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.github.mikephil.charting.charts.CandleStickChart
         android:id="@+id/candle_data"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
         android:layout_below="@id/time_frame" />
 
     <androidx.appcompat.widget.AppCompatTextView

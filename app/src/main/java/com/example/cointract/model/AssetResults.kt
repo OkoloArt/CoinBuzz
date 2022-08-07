@@ -76,3 +76,18 @@ data class ExchangeList(
     @SerializedName("exchangeUrl")
     val exchangeUrl: String,
 )
+
+data class CandlesData(
+
+    @SerializedName("open")
+    val candleOpen: String,
+
+    @SerializedName("close")
+    val candleClose: String,
+
+    @SerializedName("high")
+    val candleHigh: String,
+
+    @SerializedName("low")
+    val candleLow: String,
+)
