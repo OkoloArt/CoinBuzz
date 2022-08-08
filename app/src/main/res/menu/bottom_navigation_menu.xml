@@ -9,7 +9,7 @@
     <item
         android:id="@+id/page_2"
         android:enabled="true"
-        android:icon="@drawable/portfolio"
+        android:icon="@drawable/news"
         android:title="@string/wallet"/>
 
 </menu>

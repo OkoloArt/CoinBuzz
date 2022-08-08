@@ -61,12 +61,16 @@ class DetailFragment : Fragment() {
         coinViewModel.assetId.observe(viewLifecycleOwner) {
             it?.let {
                 retrieveAssetSingleJson(it)
-                retrieveCandleListJson(EXCHANGE, INTERVAL, it, QUOTEID)
+                retrieveCandleListJson(EXCHANGE, ONE_HOUR, it, QUOTE_ID)
             }
         }
         loadCandleStickChartData()
-
         setUpCandleStickChart()
+
+        binding.apply {
+            detailFragment = this@DetailFragment
+            detailViewModel = coinViewModel
+        }
 
     }
 
@@ -119,10 +123,10 @@ class DetailFragment : Fragment() {
             override fun onResponse(call: Call<Candles?>, response: Response<Candles?>) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     candleListResult.clear()
-                    candleListResult = response.body()!!.data.takeLast(60) as MutableList<CandlesData>
+                    candleListResult =
+                        response.body()!!.data.takeLast(30) as MutableList<CandlesData>
 
                     for (i in candleListResult.indices) {
-                        candleListResult.takeLast(30).reversed()
                         entriesData.add(CandleEntry(
                             i.toFloat(),
                             candleListResult[i].candleHigh.toFloat(),
@@ -178,23 +182,25 @@ class DetailFragment : Fragment() {
             setDrawBorders(false)
             setBackgroundColor(Color.BLACK)
             setBorderColor(Color.GRAY)
-            setVisibleXRange(7f,7f)
+            setVisibleXRange(20f, 20f)
             description = null
+            moveViewToX(entriesData.size.toFloat())
             setMaxVisibleValueCount(50)
             requestDisallowInterceptTouchEvent(true)
         }
 
         val yAxis = candleStickChart.axisLeft
         val rightAxis = candleStickChart.axisRight
-        yAxis.setDrawGridLines(true)
+        yAxis.setDrawGridLines(false)
         rightAxis.setDrawGridLines(false)
 
         val xAxis = candleStickChart.xAxis
 
         xAxis.setDrawGridLines(false) // disable x axis grid lines
-
         xAxis.setDrawLabels(false)
         rightAxis.textColor = Color.WHITE
+        yAxis.labelCount = 4
+        xAxis.labelCount=4
         yAxis.setDrawLabels(false)
         xAxis.granularity = 1f
         xAxis.isGranularityEnabled = true
@@ -206,7 +212,7 @@ class DetailFragment : Fragment() {
 
     private fun loadCandleStickChartData() {
         val dummyData: ArrayList<CandleEntry> = ArrayList<CandleEntry>()
-        dummyData.add(CandleEntry (0f,0f,0f,0f,0f))
+        dummyData.add(CandleEntry(0f, 0f, 0f, 0f, 0f))
 
         val dataSet: CandleDataSet = if (entriesData.isEmpty()) {
             CandleDataSet(dummyData, "")
@@ -222,7 +228,7 @@ class DetailFragment : Fragment() {
             increasingColor = Color.GREEN
             increasingPaintStyle = Paint.Style.FILL
             neutralColor = Color.LTGRAY
-            barSpace=0.4f
+            barSpace = 0.4f
             setDrawValues(true)
         }
 
@@ -233,9 +239,28 @@ class DetailFragment : Fragment() {
         candleStickChart.invalidate()
     }
 
+    fun oneHourChart(baseId: String) {
+        retrieveCandleListJson(EXCHANGE, ONE_HOUR, baseId, QUOTE_ID)
+    }
+
+    fun fourHourChart(baseId: String) {
+        retrieveCandleListJson(EXCHANGE, FOUR_HOUR, baseId, QUOTE_ID)
+    }
+
+    fun eightHourChart(baseId: String) {
+        retrieveCandleListJson(EXCHANGE, EIGHT_HOUR, baseId, QUOTE_ID)
+    }
+
+    fun oneDayChart(baseId: String) {
+        retrieveCandleListJson(EXCHANGE, ONE_DAY, baseId, QUOTE_ID)
+    }
+
     companion object {
         private const val EXCHANGE = "binance"
-        private const val INTERVAL = "h8"
-        private const val QUOTEID = "tether"
+        private const val ONE_HOUR = "h1"
+        private const val FOUR_HOUR = "h4"
+        private const val EIGHT_HOUR = "h8"
+        private const val ONE_DAY = "d1"
+        private const val QUOTE_ID = "tether"
     }
 }
