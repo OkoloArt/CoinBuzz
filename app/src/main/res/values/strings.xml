@@ -12,4 +12,5 @@
     <string name="intro_text">Manage your crypto assets,\n Simply</string>
     <string name="home">Home</string>
     <string name="wallet">Portfolio</string>
+    <string name="news">News</string>
 </resources>

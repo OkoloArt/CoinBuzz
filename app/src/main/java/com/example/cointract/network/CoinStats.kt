@@ -3,20 +3,18 @@ package com.example.cointract.network
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
-object RetrofitInstance {
-    private const val COIN_CAP_BASE_URL = "https://api.coincap.io/v2/"
+object RetrofitInstanceTwo {
+    private const val COIN_STATS_BASE_URL = "https://api.coinstats.app/public/v1/"
     private var retrofit: Retrofit? = null
 
-    val coinCapRetrofitInstance: Retrofit?
+    val coinStatsRetrofitInstance: Retrofit?
         get() {
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl(COIN_CAP_BASE_URL)
+                    .baseUrl(COIN_STATS_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             }
             return retrofit
         }
-
 }

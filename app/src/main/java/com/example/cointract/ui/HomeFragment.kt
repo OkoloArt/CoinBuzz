@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.cointract.R
 import com.example.cointract.adapter.HomePagerAdapter
 import com.example.cointract.databinding.FragmentHomeBinding
 import com.google.android.material.tabs.TabLayoutMediator
@@ -46,5 +48,21 @@ class HomeFragment : Fragment() {
         TabLayoutMediator(binding.tabs, binding.viewPager) { tab, position ->
             tab.text = categoryArray[position]
         }.attach()
+
+        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.home -> {
+                    // Respond to navigation item 1 click
+                    findNavController().navigate(R.id.action_nav_home_self)
+                    true
+                }
+                R.id.news -> {
+                    // Respond to navigation item 2 click
+                    findNavController().navigate(R.id.action_nav_home_to_newsFragment)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

@@ -91,3 +91,32 @@ data class CandlesData(
     @SerializedName("low")
     val candleLow: String,
 )
+
+data class MarketList(
+
+    @SerializedName("exchange")
+    val exchange: String,
+
+    @SerializedName("pair")
+    val pair: String,
+
+    @SerializedName("price")
+    val price: String,
+
+    @SerializedName("volume")
+    val volume: String,
+)
+
+data class NewsList(
+
+    @SerializedName("title")
+    val news_title: String,
+
+    @SerializedName("imgURL")
+    val news_image: String,
+
+    @SerializedName("source")
+    val news_source: String,
+
+)
+

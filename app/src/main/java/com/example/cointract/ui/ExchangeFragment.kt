@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.cointract.adapter.AssetListAdapter
 import com.example.cointract.adapter.ExchangeListAdapter
 import com.example.cointract.databinding.FragmentExchangeBinding
-import com.example.cointract.model.AssetList
-import com.example.cointract.model.AssetsList
 import com.example.cointract.model.ExchangeList
 import com.example.cointract.model.Exchanges
 import com.example.cointract.network.AssetApiInterface
@@ -49,7 +46,7 @@ class ExchangeFragment : Fragment() {
     }
 
     private fun retrieveExchangeListJson() {
-        val assetCall: Call<Exchanges?> = RetrofitInstance.retrofitInstance!!.create(
+        val assetCall: Call<Exchanges?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
             AssetApiInterface::class.java
         ).getExchangeList()
         assetCall.enqueue(object : Callback<Exchanges?> {

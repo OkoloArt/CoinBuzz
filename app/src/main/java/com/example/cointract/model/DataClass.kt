@@ -9,3 +9,8 @@ data class AssetSingle(@SerializedName("data") var data : SingleAsset)
 data class Exchanges(@SerializedName("data") var data: List<ExchangeList>)
 
 data class Candles(@SerializedName("data") var data: List<CandlesData>)
+
+data class Markets(var markets: List<MarketList>)
+
+data class News(@SerializedName("news") var news: List<NewsList>)
+

@@ -27,6 +27,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/overview"
                 android:layout_width="0dp"
+                android:onClick="@{() -> detailFragment.showOverview()}"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="OverView" />
@@ -35,6 +36,7 @@
                 android:id="@+id/markets"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:onClick="@{() -> detailFragment.showMarkets()}"
                 android:layout_height="wrap_content"
                 android:text="Markets" />
         </LinearLayout>

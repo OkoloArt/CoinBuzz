@@ -23,7 +23,7 @@ import com.example.cointract.model.AssetSingle
 import com.example.cointract.model.AssetsList
 import com.example.cointract.model.CoinViewModel
 import com.example.cointract.network.AssetApiInterface
-import com.example.cointract.network.RetrofitInstance.retrofitInstance
+import com.example.cointract.network.RetrofitInstance.coinCapRetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -81,7 +81,7 @@ class AssetsFragment : Fragment() {
     }
 
     private fun retrieveAssetListJson() {
-        val assetCall: Call<AssetsList?> = retrofitInstance!!.create(
+        val assetCall: Call<AssetsList?> = coinCapRetrofitInstance!!.create(
             AssetApiInterface::class.java
         ).getAssetList()
         assetCall.enqueue(object : Callback<AssetsList?> {
@@ -110,7 +110,7 @@ class AssetsFragment : Fragment() {
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
-        val assetCall: Call<AssetSingle?> = retrofitInstance!!.create(
+        val assetCall: Call<AssetSingle?> = coinCapRetrofitInstance!!.create(
             AssetApiInterface::class.java
         ).getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {

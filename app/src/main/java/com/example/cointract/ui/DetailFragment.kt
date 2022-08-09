@@ -9,10 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.databinding.FragmentDetailBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.AssetApiInterface
 import com.example.cointract.network.RetrofitInstance
+import com.example.cointract.network.RetrofitInstanceTwo
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
@@ -45,6 +48,12 @@ class DetailFragment : Fragment() {
     var candleListResult = mutableListOf<CandlesData>(
     )
 
+    var marketListResult = mutableListOf<MarketList>(
+    )
+
+    private lateinit var adapter: MarketAdapter
+    private var coinId =""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -60,12 +69,14 @@ class DetailFragment : Fragment() {
         candleStickChart = binding.candleData
         coinViewModel.assetId.observe(viewLifecycleOwner) {
             it?.let {
+                coinId = it
                 retrieveAssetSingleJson(it)
                 retrieveCandleListJson(EXCHANGE, ONE_HOUR, it, QUOTE_ID)
             }
         }
         loadCandleStickChartData()
         setUpCandleStickChart()
+        retrieveMarketListJson("ethereum")
 
         binding.apply {
             detailFragment = this@DetailFragment
@@ -74,8 +85,19 @@ class DetailFragment : Fragment() {
 
     }
 
+    fun showMarkets(){
+        binding.marketsRecyclerview.visibility= View.VISIBLE
+        binding.overviewDisplay.visibility = View.INVISIBLE
+
+    }
+
+    fun showOverview(){
+        binding.marketsRecyclerview.visibility= View.INVISIBLE
+        binding.overviewDisplay.visibility = View.VISIBLE
+    }
+
     private fun retrieveAssetSingleJson(assetId: String) {
-        val assetCall: Call<AssetSingle?> = RetrofitInstance.retrofitInstance!!.create(
+        val assetCall: Call<AssetSingle?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
             AssetApiInterface::class.java
         ).getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {
@@ -116,7 +138,7 @@ class DetailFragment : Fragment() {
         baseId: String,
         quoteId: String,
     ) {
-        val assetCall: Call<Candles?> = RetrofitInstance.retrofitInstance!!.create(
+        val assetCall: Call<Candles?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
             AssetApiInterface::class.java
         ).getCandleList(exchange, interval, baseId, quoteId)
         assetCall.enqueue(object : Callback<Candles?> {
@@ -142,6 +164,32 @@ class DetailFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<Candles?>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
+    private fun retrieveMarketListJson(
+        coinId: String,
+    ) {
+        val assetCall: Call<List<MarketList>?> = RetrofitInstanceTwo.coinStatsRetrofitInstance!!.create(
+            AssetApiInterface::class.java
+        ).getMarketList(coinId)
+        assetCall.enqueue(object : Callback<List<MarketList>?> {
+            override fun onResponse(call: Call<List<MarketList>?>, response: Response<List<MarketList>?>) {
+                if (response.isSuccessful && response.body() != null) {
+
+                    marketListResult.clear()
+                    marketListResult = response.body()!! as MutableList<MarketList>
+                    adapter = MarketAdapter()
+                    adapter.submitList(marketListResult)
+                    binding.marketsRecyclerview.layoutManager =
+                        LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                    binding.marketsRecyclerview.adapter = adapter
+                }
+            }
+
+            override fun onFailure(call: Call<List<MarketList>?>, t: Throwable) {
                 TODO("Not yet implemented")
             }
         })
@@ -200,7 +248,7 @@ class DetailFragment : Fragment() {
         xAxis.setDrawLabels(false)
         rightAxis.textColor = Color.WHITE
         yAxis.labelCount = 4
-        xAxis.labelCount=4
+        xAxis.labelCount = 4
         yAxis.setDrawLabels(false)
         xAxis.granularity = 1f
         xAxis.isGranularityEnabled = true

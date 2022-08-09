@@ -12,6 +12,12 @@
         <action
             android:id="@+id/action_nav_home_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_newsFragment"
+            app:destination="@id/newsFragment" />
+        <action
+            android:id="@+id/action_nav_home_self"
+            app:destination="@id/nav_home" />
     </fragment>
 
     <fragment
@@ -32,4 +38,9 @@
         android:name="com.example.cointract.ui.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" />
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="com.example.cointract.ui.NewsFragment"
+        android:label="fragment_news"
+        tools:layout="@layout/fragment_news" />
 </navigation>
