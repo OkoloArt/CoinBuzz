@@ -13,4 +13,6 @@
     <string name="home">Home</string>
     <string name="wallet">Portfolio</string>
     <string name="news">News</string>
+    <string name="channel_name">coin_channel</string>
+    <string name="channel_description">coin_price_reminder</string>
 </resources>

@@ -10,8 +10,8 @@ import com.example.cointract.adapter.ExchangeListAdapter
 import com.example.cointract.databinding.FragmentExchangeBinding
 import com.example.cointract.model.ExchangeList
 import com.example.cointract.model.Exchanges
-import com.example.cointract.network.AssetApiInterface
-import com.example.cointract.network.RetrofitInstance
+import com.example.cointract.network.CoinApiInterface
+import com.example.cointract.network.CoinCapRetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,8 +46,8 @@ class ExchangeFragment : Fragment() {
     }
 
     private fun retrieveExchangeListJson() {
-        val assetCall: Call<Exchanges?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+        val assetCall: Call<Exchanges?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
+            CoinApiInterface::class.java
         ).getExchangeList()
         assetCall.enqueue(object : Callback<Exchanges?> {
             override fun onResponse(call: Call<Exchanges?>, response: Response<Exchanges?>) {

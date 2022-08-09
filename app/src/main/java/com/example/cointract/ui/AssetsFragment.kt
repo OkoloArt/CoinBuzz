@@ -18,12 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
 import com.example.cointract.adapter.AssetListAdapter
 import com.example.cointract.databinding.FragmentAssetsBinding
-import com.example.cointract.model.AssetList
-import com.example.cointract.model.AssetSingle
-import com.example.cointract.model.AssetsList
-import com.example.cointract.model.CoinViewModel
-import com.example.cointract.network.AssetApiInterface
-import com.example.cointract.network.RetrofitInstance.coinCapRetrofitInstance
+import com.example.cointract.model.*
+import com.example.cointract.network.CoinApiInterface
+import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -82,7 +79,7 @@ class AssetsFragment : Fragment() {
 
     private fun retrieveAssetListJson() {
         val assetCall: Call<AssetsList?> = coinCapRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+            CoinApiInterface::class.java
         ).getAssetList()
         assetCall.enqueue(object : Callback<AssetsList?> {
             override fun onResponse(call: Call<AssetsList?>, response: Response<AssetsList?>) {
@@ -111,7 +108,7 @@ class AssetsFragment : Fragment() {
 
     private fun retrieveAssetSingleJson(assetId: String) {
         val assetCall: Call<AssetSingle?> = coinCapRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+            CoinApiInterface::class.java
         ).getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {
             @SuppressLint("SetTextI18n")

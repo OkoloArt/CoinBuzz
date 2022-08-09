@@ -7,7 +7,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 
-interface AssetApiInterface {
+interface CoinApiInterface {
 
     @GET("assets")
     fun getAssetList(

@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.databinding.FragmentDetailBinding
 import com.example.cointract.model.*
-import com.example.cointract.network.AssetApiInterface
-import com.example.cointract.network.RetrofitInstance
-import com.example.cointract.network.RetrofitInstanceTwo
+import com.example.cointract.network.CoinApiInterface
+import com.example.cointract.network.CoinCapRetrofitInstance
+import com.example.cointract.network.CoinStatsRetrofitInstance
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
@@ -97,8 +97,8 @@ class DetailFragment : Fragment() {
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
-        val assetCall: Call<AssetSingle?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+        val assetCall: Call<AssetSingle?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
+            CoinApiInterface::class.java
         ).getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {
             @SuppressLint("SetTextI18n")
@@ -138,15 +138,15 @@ class DetailFragment : Fragment() {
         baseId: String,
         quoteId: String,
     ) {
-        val assetCall: Call<Candles?> = RetrofitInstance.coinCapRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+        val assetCall: Call<Candles?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
+            CoinApiInterface::class.java
         ).getCandleList(exchange, interval, baseId, quoteId)
         assetCall.enqueue(object : Callback<Candles?> {
             override fun onResponse(call: Call<Candles?>, response: Response<Candles?>) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     candleListResult.clear()
                     candleListResult =
-                        response.body()!!.data.takeLast(30) as MutableList<CandlesData>
+                        response.body()!!.data.takeLast(10) as MutableList<CandlesData>
 
                     for (i in candleListResult.indices) {
                         entriesData.add(CandleEntry(
@@ -172,8 +172,8 @@ class DetailFragment : Fragment() {
     private fun retrieveMarketListJson(
         coinId: String,
     ) {
-        val assetCall: Call<List<MarketList>?> = RetrofitInstanceTwo.coinStatsRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+        val assetCall: Call<List<MarketList>?> = CoinStatsRetrofitInstance.coinStatsRetrofitInstance!!.create(
+            CoinApiInterface::class.java
         ).getMarketList(coinId)
         assetCall.enqueue(object : Callback<List<MarketList>?> {
             override fun onResponse(call: Call<List<MarketList>?>, response: Response<List<MarketList>?>) {

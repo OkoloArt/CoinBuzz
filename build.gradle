@@ -18,4 +18,5 @@ ext {
     nav_version = '2.3.5'
     koin_version = '3.2.0'
     picasso_version = '2.71828'
+    work_version = "2.6.0"
 }

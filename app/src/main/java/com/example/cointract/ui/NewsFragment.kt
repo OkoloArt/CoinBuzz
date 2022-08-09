@@ -10,8 +10,8 @@ import com.example.cointract.adapter.NewsAdapter
 import com.example.cointract.databinding.FragmentNewsBinding
 import com.example.cointract.model.News
 import com.example.cointract.model.NewsList
-import com.example.cointract.network.AssetApiInterface
-import com.example.cointract.network.RetrofitInstanceTwo
+import com.example.cointract.network.CoinApiInterface
+import com.example.cointract.network.CoinStatsRetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,8 +45,8 @@ class NewsFragment : Fragment() {
     }
 
     private fun retrieveNewsListJson(skip:String,limit:String) {
-        val assetCall: Call<News?> = RetrofitInstanceTwo.coinStatsRetrofitInstance!!.create(
-            AssetApiInterface::class.java
+        val assetCall: Call<News?> = CoinStatsRetrofitInstance.coinStatsRetrofitInstance!!.create(
+            CoinApiInterface::class.java
         ).getNewsList(skip, limit)
         assetCall.enqueue(object : Callback<News?> {
             override fun onResponse(call: Call<News?>, response: Response<News?>) {
