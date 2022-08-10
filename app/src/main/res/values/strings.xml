@@ -15,4 +15,11 @@
     <string name="news">News</string>
     <string name="channel_name">coin_channel</string>
     <string name="channel_description">coin_price_reminder</string>
+    <string name="app_setting_text">App</string>
+    
+    <!-- Preference Titles -->
+    <string name="security">Security</string>
+    <string name="biometric">Biometric Authentication</string>
+    <string name="launch_screen">Launch Screen</string>
+    <string name="switch_mode">Switch Mode</string>
 </resources>

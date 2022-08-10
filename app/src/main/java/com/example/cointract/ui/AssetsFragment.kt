@@ -11,9 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
 import com.example.cointract.adapter.AssetListAdapter
@@ -65,6 +67,9 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val value = prefs.getString("launch", "true")
+
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
@@ -75,6 +80,12 @@ class AssetsFragment : Fragment() {
                 retrieveAssetListJson()
             }
         }, 0, 5000)
+
+        if (value == "true"){
+            Toast.makeText(requireContext(),"value: $value", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(requireContext(),"value: $value", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun retrieveAssetListJson() {

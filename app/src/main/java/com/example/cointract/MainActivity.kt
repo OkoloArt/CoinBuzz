@@ -36,11 +36,11 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_home), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
-      //  navView.setupWithNavController(navController)
+//        navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
            if (menuItem.itemId == R.id.nav_settings){
-               Toast.makeText(this,"Settings",Toast.LENGTH_SHORT).show()
+               navController.navigate(R.id.action_nav_home_to_nav_settings)
            }
             drawerLayout.close()
             true

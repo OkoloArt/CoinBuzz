@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cointract.R
 import com.example.cointract.adapter.NewsAdapter
 import com.example.cointract.databinding.FragmentNewsBinding
 import com.example.cointract.model.News
