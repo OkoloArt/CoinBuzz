@@ -6,11 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import com.example.cointract.R
 import com.example.cointract.adapter.HomePagerAdapter
 import com.example.cointract.databinding.FragmentHomeBinding
+import com.example.cointract.datastore.SettingsManager
 import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeFragment : Fragment() {
@@ -26,6 +27,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var pagerAdapter: HomePagerAdapter
+    private lateinit var settingsManager: SettingsManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +43,7 @@ class HomeFragment : Fragment() {
 
 
         pagerAdapter = HomePagerAdapter(requireActivity())
+        settingsManager = SettingsManager(requireContext())
         binding.apply {
             viewPager.adapter = pagerAdapter
             viewPager.isUserInputEnabled = false
@@ -65,6 +68,23 @@ class HomeFragment : Fragment() {
                 }
                 else -> false
             }
+        }
+
+        observeData()
+    }
+
+    private fun observeData() {
+
+        // Updates LauchScreen selection
+        // every time user changes it, it will be observed by preferenceLaunchScreenFlow
+//        settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
+//          Toast.makeText(requireContext(),"screen: $it",Toast.LENGTH_SHORT).show()
+//        }
+
+        // Updates DayNight selection
+        // every time user changes it, it will be observed by preferenceDayNightFlow
+        settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
+
         }
     }
 }

@@ -32,6 +32,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:onClick="@{()-> settingsFragment.textPopUp()}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -41,7 +42,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:onClick="@{()-> settingsFragment.textPopUp()}"
                         android:text="@string/launch_screen" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -53,6 +53,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:onClick="@{() -> settingsFragment.setDayNightMode()}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
