@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -75,16 +76,17 @@ class SettingsFragment : Fragment() {
     fun setDayNightMode() {
         dayNightMode = !dayNightMode
         if (dayNightMode) {
-            Toast.makeText(requireContext(), " Clicked: $dayNightMode", Toast.LENGTH_SHORT).show()
+           binding.modeImage.setImageResource(R.drawable.ic_dark_mode)
             lifecycleScope.launch {
                 settingsManager.storeUserDayNightTheme(dayNightMode, requireContext())
             }
         } else {
-            Toast.makeText(requireContext(), " Clicked: $dayNightMode", Toast.LENGTH_SHORT).show()
+            binding.modeImage.setImageResource(R.drawable.ic_light_mode)
             lifecycleScope.launch {
                 settingsManager.storeUserDayNightTheme(dayNightMode, requireContext())
             }
         }
+        findNavController().navigate(R.id.action_nav_settings_to_splashFragment)
     }
 
     private fun setBiometricSettings() {
@@ -108,13 +110,19 @@ class SettingsFragment : Fragment() {
         // Updates Launch Screen selection
         // every time user changes it, it will be observed by preferenceLaunchScreenFlow
         settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
-            binding.launch.text = it
+            launchScreen=it
+            binding.launch.text = launchScreen
         }
 
         // Updates DayNight selection
         // every time user changes it, it will be observed by preferenceDayNightFlow
         settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
             dayNightMode = it
+            if (dayNightMode){
+                binding.modeImage.setImageResource(R.drawable.ic_dark_mode)
+            }else{
+                binding.modeImage.setImageResource(R.drawable.ic_light_mode)
+            }
         }
 
         // Updates Biometric selection
@@ -122,6 +130,7 @@ class SettingsFragment : Fragment() {
         settingsManager.preferenceBiometricFlow.asLiveData().observe(viewLifecycleOwner) {
             binding.biometricSwitch.isChecked = it
         }
+
     }
 
     private fun handleLaunchScreenAction(){
@@ -131,7 +140,7 @@ class SettingsFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     when(launchScreen){
                         "Markets" ->{findNavController().navigate(R.id.action_nav_settings_to_nav_home)}
-                        "News" ->{findNavController().navigate(R.id.action_nav_settings_to_nav_home)}
+                        "News" ->{findNavController().navigate(R.id.action_nav_settings_to_newsFragment2)}
                     }
                 }
             })
