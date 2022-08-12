@@ -83,8 +83,13 @@ class MainActivity : AppCompatActivity() {
                         //doSomethingHere()
                         supportActionBar?.show()
                         binding.appBarMain.bottomNavigation.visibility = View.VISIBLE
+                        binding.appBarMain.bottomNavigation.selectedItemId
                         supportActionBar?.title = null
                     }, 0)
+                }
+                R.id.newsFragment -> {
+                    binding.appBarMain.bottomNavigation.visibility = View.VISIBLE
+                    binding.appBarMain.bottomNavigation.selectedItemId
                 }
                 else -> {
                     supportActionBar?.hide()
@@ -134,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun NavController.safeNavigate(direction: NavDirections) {
+    private fun NavController.safeNavigate(direction: NavDirections) {
         currentDestination?.getAction(direction.actionId)?.run { navigate(direction) }
     }
 

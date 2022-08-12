@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_nav_settings_to_newsFragment2"
             app:destination="@id/newsFragment" />
+        <action
+            android:id="@+id/action_nav_settings_to_splashFragment"
+            app:destination="@id/splashFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"

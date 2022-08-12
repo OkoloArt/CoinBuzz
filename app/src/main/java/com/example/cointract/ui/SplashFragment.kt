@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSplashBinding
+import com.example.cointract.datastore.SettingsManager
 
 /**
  * A simple [Fragment] subclass.
@@ -22,6 +24,8 @@ class SplashFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var settingsManager: SettingsManager
+    private var dayNightMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,12 +39,26 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-       binding.apply {
-           splashFragment = this@SplashFragment
-       }
+        settingsManager = SettingsManager(requireContext())
+        binding.apply {
+            splashFragment = this@SplashFragment
+        }
+
+        checkDayNightSettings()
     }
 
-    fun goToNextScreen(){
+    fun goToNextScreen() {
+        if (dayNightMode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
         findNavController().navigate(R.id.action_splashFragment_to_nav_home)
+    }
+
+    private fun checkDayNightSettings() {
+        settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
+            dayNightMode = it
+        }
     }
 }
