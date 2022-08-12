@@ -7,13 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSettingsBinding
 import com.example.cointract.datastore.SettingsManager
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 class SettingsFragment : Fragment() {
 
@@ -23,7 +26,7 @@ class SettingsFragment : Fragment() {
     private lateinit var settingsManager: SettingsManager
 
     private var dayNightMode = false
-    private var biometricClicked = false
+    private var launchScreen = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,18 +45,8 @@ class SettingsFragment : Fragment() {
             settingsFragment = this@SettingsFragment
         }
 
-        // Updates DayNight selection
-        // every time user changes it, it will be observed by preferenceDayNightFlow
-        settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
-            dayNightMode = it
-        }
-
-        // Updates DayNight selection
-        // every time user changes it, it will be observed by preferenceDayNightFlow
-        settingsManager.preferenceBiometricFlow.asLiveData().observe(viewLifecycleOwner) {
-            binding.biometricSwitch.isChecked = it
-        }
-
+        handleLaunchScreenAction()
+        updateData()
         setBiometricSettings()
     }
 
@@ -69,7 +62,10 @@ class SettingsFragment : Fragment() {
         popupMenu.setOnMenuItemClickListener { item ->
             Toast.makeText(requireContext(), " Clicked: ${item.title}", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch {
-                settingsManager.storeUserLaunchScreen(item.title.toString(), requireContext())
+                launchScreen = item.title.toString()
+                settingsManager.storeUserLaunchScreen(launchScreen, requireContext())
+                binding.launch.text = launchScreen
+
             }
             true
         }
@@ -106,4 +102,39 @@ class SettingsFragment : Fragment() {
             }
         }
     }
+
+    private fun updateData() {
+
+        // Updates Launch Screen selection
+        // every time user changes it, it will be observed by preferenceLaunchScreenFlow
+        settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
+            binding.launch.text = it
+        }
+
+        // Updates DayNight selection
+        // every time user changes it, it will be observed by preferenceDayNightFlow
+        settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
+            dayNightMode = it
+        }
+
+        // Updates Biometric selection
+        // every time user changes it, it will be observed by preferenceBiometricFlow
+        settingsManager.preferenceBiometricFlow.asLiveData().observe(viewLifecycleOwner) {
+            binding.biometricSwitch.isChecked = it
+        }
+    }
+
+    private fun handleLaunchScreenAction(){
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    when(launchScreen){
+                        "Markets" ->{findNavController().navigate(R.id.action_nav_settings_to_nav_home)}
+                        "News" ->{findNavController().navigate(R.id.action_nav_settings_to_nav_home)}
+                    }
+                }
+            })
+    }
+
 }
