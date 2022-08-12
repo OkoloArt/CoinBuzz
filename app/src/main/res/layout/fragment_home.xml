@@ -35,11 +35,4 @@
         android:layout_marginTop="5dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_height="wrap_content"
-        app:menu="@menu/bottom_navigation_menu" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

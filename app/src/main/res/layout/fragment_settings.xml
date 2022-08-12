@@ -38,14 +38,14 @@
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/launch"
+
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/launch_screen" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/asset_priceUsd"
+                        android:id="@+id/launch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="markets >" />

@@ -78,6 +78,9 @@ class AssetsFragment : Fragment() {
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 retrieveAssetListJson()
+                retrieveAssetSingleJson(BITCOIN)
+                retrieveAssetSingleJson(ETHEREUM)
+                retrieveAssetSingleJson(TETHER)
             }
         }, 0, 5000)
 

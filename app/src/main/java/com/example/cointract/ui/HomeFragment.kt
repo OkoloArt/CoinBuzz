@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
@@ -13,6 +14,7 @@ import com.example.cointract.adapter.HomePagerAdapter
 import com.example.cointract.databinding.FragmentHomeBinding
 import com.example.cointract.datastore.SettingsManager
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlin.system.exitProcess
 
 class HomeFragment : Fragment() {
 
@@ -54,23 +56,19 @@ class HomeFragment : Fragment() {
             tab.text = categoryArray[position]
         }.attach()
 
-        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.home -> {
-                    // Respond to navigation item 1 click
-                    findNavController().navigate(R.id.action_nav_home_self)
-                    true
-                }
-                R.id.news -> {
-                    // Respond to navigation item 2 click
-                    findNavController().navigate(R.id.action_nav_home_to_newsFragment)
-                    true
-                }
-                else -> false
-            }
-        }
-
+        handleOnBackPressed()
         observeData()
+    }
+
+    private fun handleOnBackPressed(){
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                   activity!!.finish()
+                    exitProcess(0)
+                }
+            })
     }
 
     private fun observeData() {

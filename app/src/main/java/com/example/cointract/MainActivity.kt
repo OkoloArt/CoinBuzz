@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.view.Menu
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -15,12 +16,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.cointract.databinding.ActivityMainBinding
 import com.example.cointract.datastore.SettingsManager
+import com.example.cointract.ui.HomeFragmentDirections
+import com.example.cointract.ui.NewsFragmentDirections
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
@@ -73,23 +78,33 @@ class MainActivity : AppCompatActivity() {
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.splashFragment -> {
-                    supportActionBar?.hide()
-                    drawerLayout.close()
-                }
-                R.id.detailFragment -> {
-                    supportActionBar?.hide()
-                }
-                else -> {
+                R.id.nav_home -> {
                     Handler(Looper.getMainLooper()).postDelayed({
                         //doSomethingHere()
                         supportActionBar?.show()
+                        binding.appBarMain.bottomNavigation.visibility = View.VISIBLE
                         supportActionBar?.title = null
-                        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_indicator_person)
                     }, 0)
-
+                }
+                else -> {
+                    supportActionBar?.hide()
+                    binding.appBarMain.bottomNavigation.visibility = View.GONE
                 }
             }
+        }
+
+        binding.appBarMain.bottomNavigation.setOnItemSelectedListener { id ->
+            when (id.itemId) {
+                R.id.home -> {
+                    // Respond to navigation item 1 click
+                    navController.safeNavigate(NewsFragmentDirections.actionNewsFragmentToNavHome())
+                }
+                R.id.news -> {
+                    // Respond to navigation item 2 click
+                    navController.safeNavigate(HomeFragmentDirections.actionNavHomeToNewsFragment())
+                }
+            }
+            true
         }
 
         val header = navView.getHeaderView(0)
@@ -98,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             setProfileImage()
         }
 
-        displayName=header.findViewById(R.id.display_name)
+        displayName = header.findViewById(R.id.display_name)
         displayName.setOnClickListener {
             showDialog()
         }
@@ -106,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         settingsManager.preferenceProfileImageFlow.asLiveData().observe(this) {
             if (it.equals("")) {
                 profileImage.setImageResource(R.drawable.ic_indicator_person)
+                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_indicator_person)
             } else {
                 profileImage.setImageURI(Uri.parse(it))
             }
@@ -116,6 +132,10 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    fun NavController.safeNavigate(direction: NavDirections) {
+        currentDestination?.getAction(direction.actionId)?.run { navigate(direction) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -166,7 +186,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showDialog() {
+    private fun showDialog() {
         val inflater = this.layoutInflater;
         val view = inflater.inflate(R.layout.display_dialog_layout, null)
         val inputLayout = view.findViewById<TextInputLayout>(R.id.outlinedTextField)

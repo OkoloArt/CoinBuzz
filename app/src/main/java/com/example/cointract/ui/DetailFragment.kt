@@ -146,7 +146,7 @@ class DetailFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
                     candleListResult.clear()
                     candleListResult =
-                        response.body()!!.data.takeLast(10) as MutableList<CandlesData>
+                        response.body()!!.data.takeLast(30) as MutableList<CandlesData>
 
                     for (i in candleListResult.indices) {
                         entriesData.add(CandleEntry(
