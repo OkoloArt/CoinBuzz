@@ -1,32 +1,48 @@
 package com.example.cointract
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.Menu
-import android.webkit.PermissionRequest
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.cointract.databinding.ActivityMainBinding
+import com.example.cointract.datastore.SettingsManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputLayout
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.PermissionListener
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private val pickImage = 100
+
+    private var imageUri: Uri? = null
+    private lateinit var profileImage: ImageView
+    private lateinit var displayName: TextView
+
+    private lateinit var settingsManager: SettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +50,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
+
+        settingsManager = SettingsManager(this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -57,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.splashFragment -> {
                     supportActionBar?.hide()
+                    drawerLayout.close()
                 }
                 R.id.detailFragment -> {
                     supportActionBar?.hide()
@@ -74,10 +93,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         val header = navView.getHeaderView(0)
-        val profileImage = header.findViewById<ImageView>(R.id.profile_image)
+        profileImage = header.findViewById(R.id.profile_image)
         profileImage.setOnClickListener {
-            Toast.makeText(this,"ImageView",Toast.LENGTH_SHORT).show()
+            setProfileImage()
         }
+
+        displayName=header.findViewById(R.id.display_name)
+        displayName.setOnClickListener {
+            showDialog()
+        }
+
+        settingsManager.preferenceProfileImageFlow.asLiveData().observe(this) {
+            if (it.equals("")) {
+                profileImage.setImageResource(R.drawable.ic_indicator_person)
+            } else {
+                profileImage.setImageURI(Uri.parse(it))
+            }
+        }
+
+        settingsManager.preferenceDisplayNameFlow.asLiveData().observe(this) {
+            displayName.text = it
+        }
+
 
     }
 
@@ -92,16 +129,19 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setProfileImage(){
+    private fun setProfileImage() {
         Dexter.withContext(this)
-            .withPermission(Manifest.permission.CAMERA)
+            .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             .withListener(object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                    TODO("Not yet implemented")
+                    val gallery =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                    startActivityForResult(gallery, pickImage)
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
-                    TODO("Not yet implemented")
+                    Toast.makeText(this@MainActivity, "Permission failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
@@ -114,4 +154,45 @@ class MainActivity : AppCompatActivity() {
             }).check()
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+            lifecycleScope.launch {
+                settingsManager.storeUserProfileImage(imageUri.toString(), this@MainActivity)
+            }
+            profileImage.setImageURI(imageUri)
+        }
+    }
+
+    fun showDialog() {
+        val inflater = this.layoutInflater;
+        val view = inflater.inflate(R.layout.display_dialog_layout, null)
+        val inputLayout = view.findViewById<TextInputLayout>(R.id.outlinedTextField)
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_App_MaterialAlertDialog)
+            .setView(view)
+            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                // Respond to negative button press
+                dialog.cancel()
+            }
+            .setPositiveButton(resources.getString(R.string.accept)) { dialog, _ ->
+                // Respond to negative button press
+                val input = inputLayout.editText?.text.toString()
+                saveDisplayName(input)
+            }
+            .show()
+    }
+
+    private fun saveDisplayName(displayName: String) {
+        if (displayName.isNotBlank()) {
+            // Launch a coroutine and write the layout setting in the preference Datastore
+            lifecycleScope.launch {
+                settingsManager.storeUserDisplayName(
+                    displayName,
+                    this@MainActivity
+                )
+            }
+        }
+    }
 }

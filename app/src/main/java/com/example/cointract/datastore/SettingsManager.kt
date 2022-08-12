@@ -29,11 +29,22 @@ class SettingsManager(context: Context) {
         }
     }
 
+    val preferenceLaunchScreenFlow: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            // On the first run of the app, we will use 0 by default
+            preferences[LAUNCH_SCREEN] ?: "Markets"
+        }
+
     suspend fun storeUserDayNightTheme(dayNight: Boolean, context: Context) {
         context.dataStore.edit {
             it[DAY_NIGHT_MODE] = dayNight
         }
     }
+
+    val preferenceDayNightFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[DAY_NIGHT_MODE] ?: false
+        }
 
     suspend fun storeUserBiometricSettings(biometric: Boolean, context: Context) {
         context.dataStore.edit {
@@ -41,25 +52,38 @@ class SettingsManager(context: Context) {
         }
     }
 
-    val preferenceLaunchScreenFlow: Flow<String> = context.dataStore.data
-        .map { preferences ->
-            // On the first run of the app, we will use 0 by default
-            preferences[LAUNCH_SCREEN] ?: "Markets"
-        }
-
-    val preferenceDayNightFlow: Flow<Boolean> = context.dataStore.data
-        .map { preferences ->
-            preferences[DAY_NIGHT_MODE] ?: false
-        }
-
     val preferenceBiometricFlow: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[BIOMETRIC_SETTING] ?: false
+        }
+
+    suspend fun storeUserProfileImage(profileImage: String, context: Context) {
+        context.dataStore.edit {
+            it[PROFILE_IMAGE] = profileImage
+        }
+    }
+
+    val preferenceProfileImageFlow: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[PROFILE_IMAGE] ?: ""
+        }
+
+    suspend fun storeUserDisplayName(displayName: String, context: Context) {
+        context.dataStore.edit {
+            it[DISPLAY_NAME] = displayName
+        }
+    }
+
+    val preferenceDisplayNameFlow: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[DISPLAY_NAME] ?: "Hi, User"
         }
 
     companion object {
         private val LAUNCH_SCREEN = stringPreferencesKey("launch_screen")
         private val DAY_NIGHT_MODE = booleanPreferencesKey("day_night_mode")
         private val BIOMETRIC_SETTING = booleanPreferencesKey("biometric")
+        private val PROFILE_IMAGE = stringPreferencesKey("profile_image")
+        private val DISPLAY_NAME = stringPreferencesKey("display_name")
     }
 }
