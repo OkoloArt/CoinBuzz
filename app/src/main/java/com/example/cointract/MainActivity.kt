@@ -1,9 +1,12 @@
 package com.example.cointract
 
+import android.Manifest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Menu
+import android.webkit.PermissionRequest
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -11,9 +14,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.example.cointract.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.single.PermissionListener
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,9 +47,9 @@ class MainActivity : AppCompatActivity() {
 //        navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
-           if (menuItem.itemId == R.id.nav_settings){
-               navController.navigate(R.id.action_nav_home_to_nav_settings)
-           }
+            if (menuItem.itemId == R.id.nav_settings) {
+                navController.navigate(R.id.action_nav_home_to_nav_settings)
+            }
             drawerLayout.close()
             true
         }
@@ -64,6 +72,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        val header = navView.getHeaderView(0)
+        val profileImage = header.findViewById<ImageView>(R.id.profile_image)
+        profileImage.setOnClickListener {
+            Toast.makeText(this,"ImageView",Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,4 +91,27 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+    private fun setProfileImage(){
+        Dexter.withContext(this)
+            .withPermission(Manifest.permission.CAMERA)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: com.karumi.dexter.listener.PermissionRequest?,
+                    p1: PermissionToken?,
+                ) {
+                    TODO("Not yet implemented")
+                }
+
+            }).check()
+    }
+
 }

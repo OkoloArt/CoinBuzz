@@ -75,6 +75,9 @@ dependencies {
     // DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
+    // Runtime permission
+    implementation 'com.karumi:dexter:6.2.3'
+
     // Koin for Android
     implementation "io.insert-koin:koin-android:$koin_version"
     // Testing
