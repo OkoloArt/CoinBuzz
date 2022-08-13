@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
 import com.example.cointract.adapter.AssetListAdapter
@@ -23,6 +22,10 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
 import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInstance
+import com.example.cointract.utils.ConnectivityObserver
+import com.example.cointract.utils.NetworkConnectivityObserver
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -54,7 +57,6 @@ class AssetsFragment : Fragment() {
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
     private val symbol = numberFormat.currency?.symbol
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -67,9 +69,6 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val value = prefs.getString("launch", "true")
-
         retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
@@ -78,17 +77,9 @@ class AssetsFragment : Fragment() {
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 retrieveAssetListJson()
-                retrieveAssetSingleJson(BITCOIN)
-                retrieveAssetSingleJson(ETHEREUM)
-                retrieveAssetSingleJson(TETHER)
             }
         }, 0, 5000)
 
-        if (value == "true"){
-            Toast.makeText(requireContext(),"value: $value", Toast.LENGTH_SHORT).show()
-        }else{
-            Toast.makeText(requireContext(),"value: $value", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun retrieveAssetListJson() {
@@ -102,7 +93,7 @@ class AssetsFragment : Fragment() {
                     assetsResultList.clear()
                     assetsResultList = response.body()?.data as MutableList<AssetList>
                     assetsResultList.subList(0, 3).clear()
-                    adapter = AssetListAdapter{
+                    adapter = AssetListAdapter {
                         coinViewModel.setAssetId(it.assetId)
                         findNavController().navigate(R.id.action_nav_home_to_detailFragment)
                     }

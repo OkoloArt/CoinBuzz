@@ -14,7 +14,7 @@
             android:id="@+id/layoutTop"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:background="@color/black"
+            style="@style/layout_background"
             android:orientation="vertical" >
 
             <TextSwitcher
