@@ -45,14 +45,17 @@ class SplashFragment : Fragment() {
         }
 
         checkDayNightSettings()
+        binding.nextScreen.setOnClickListener {
+            goToNextScreen()
+        }
     }
 
-    fun goToNextScreen() {
-        if (dayNightMode){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }else{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+    private fun goToNextScreen() {
+//        if (dayNightMode){
+//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//        }else{
+//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//        }
         findNavController().navigate(R.id.action_splashFragment_to_nav_home)
     }
 

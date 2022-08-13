@@ -4,16 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.cointract.R
 import com.example.cointract.adapter.NewsAdapter
 import com.example.cointract.databinding.FragmentNewsBinding
 import com.example.cointract.model.News
 import com.example.cointract.model.NewsList
 import com.example.cointract.network.CoinApiInterface
 import com.example.cointract.network.CoinStatsRetrofitInstance
+import com.example.cointract.utils.ConnectivityObserver
+import com.example.cointract.utils.NetworkConnectivityObserver
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +33,8 @@ class NewsFragment : Fragment() {
     private lateinit var adapter: NewsAdapter
   var newsListResult = mutableListOf<NewsList>()
 
+    private lateinit var connectivityObserver: ConnectivityObserver
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -42,6 +46,11 @@ class NewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        connectivityObserver = NetworkConnectivityObserver(requireContext())
+        connectivityObserver.observeNetworkStatus().asLiveData().observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(),"Status: $it", Toast.LENGTH_SHORT).show()
+        }
 
         retrieveNewsListJson("0","10")
     }

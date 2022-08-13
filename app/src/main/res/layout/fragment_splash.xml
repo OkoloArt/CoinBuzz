@@ -31,9 +31,9 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="match_parent"
-            android:onClick="@{() -> splashFragment.goToNextScreen()}"
-            android:layout_below="@id/splash_intro_text"
             android:layout_height="wrap_content"
+            android:layout_below="@id/splash_intro_text"
+            android:id="@+id/next_screen"
             android:text="Get Started" />
 
     </RelativeLayout>

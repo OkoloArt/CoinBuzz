@@ -84,4 +84,8 @@ dependencies {
     implementation "io.insert-koin:koin-android:$koin_version"
     // Testing
     testImplementation "io.insert-koin:koin-test:$koin_version"
+
+    // Biometric Authentication
+    implementation "androidx.biometric:biometric:1.2.0-alpha04"
+
 }
