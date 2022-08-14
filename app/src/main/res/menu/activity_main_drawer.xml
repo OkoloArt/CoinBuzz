@@ -8,5 +8,17 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_settings"
             android:title="@string/action_settings" />
+        <item
+            android:id="@+id/tools"
+            android:icon="@drawable/ic_tools"
+            android:title="@string/tools" />
+        <item
+            android:id="@+id/help_center"
+            android:icon="@drawable/ic_help_center"
+            android:title="@string/help_center" />
+        <item
+            android:id="@+id/about_us"
+            android:icon="@drawable/ic_info"
+            android:title="@string/about_us" />
     </group>
 </menu>

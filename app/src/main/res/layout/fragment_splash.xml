@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/crypto" />
+            app:srcCompat="@mipmap/crypto" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
