@@ -4,22 +4,28 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.databinding.FragmentDetailBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
-import com.example.cointract.network.CoinCapRetrofitInstance
-import com.example.cointract.network.CoinStatsRetrofitInstance
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.qualifier.named
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,17 +48,19 @@ class DetailFragment : Fragment() {
     private val symbol = numberFormat.currency?.symbol
 
     private val coinViewModel: CoinViewModel by activityViewModels()
+    private val coinStatsInstance by inject<CoinApiInterface>(named("CoinStats"))
+    private val coinCapInstance by inject<CoinApiInterface>(named("CoinCap"))
 
     private lateinit var candleStickChart: CandleStickChart
     private var entriesData = mutableListOf<CandleEntry>()
-    var candleListResult = mutableListOf<CandlesData>(
+    private var candleListResult = mutableListOf<CandlesData>(
     )
 
-    var marketListResult = mutableListOf<MarketList>(
+    private var marketListResult = mutableListOf<MarketList>(
     )
 
     private lateinit var adapter: MarketAdapter
-    private var coinId =""
+    private var coinId = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,16 +75,24 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         candleStickChart = binding.candleData
-        coinViewModel.assetId.observe(viewLifecycleOwner) {
-            it?.let {
-                coinId = it
-                retrieveAssetSingleJson(it)
-                retrieveCandleListJson(EXCHANGE, ONE_HOUR, it, QUOTE_ID)
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+
+                Handler(Looper.getMainLooper()).post {
+                    coinViewModel.assetId.observe(viewLifecycleOwner) {
+                        it?.let {
+                            coinId = it
+                            retrieveAssetSingleJson(coinId)
+                            retrieveCandleListJson(EXCHANGE, FOUR_HOUR, coinId, QUOTE_ID)
+                            retrieveMarketListJson(coinId)
+                        }
+                    }
+                }
+                loadCandleStickChartData()
+                setUpCandleStickChart()
             }
         }
-        loadCandleStickChartData()
-        setUpCandleStickChart()
-        retrieveMarketListJson("ethereum")
 
         binding.apply {
             detailFragment = this@DetailFragment
@@ -85,21 +101,19 @@ class DetailFragment : Fragment() {
 
     }
 
-    fun showMarkets(){
-        binding.marketsRecyclerview.visibility= View.VISIBLE
+    fun showMarkets() {
+        binding.marketsRecyclerview.visibility = View.VISIBLE
         binding.overviewDisplay.visibility = View.INVISIBLE
 
     }
 
-    fun showOverview(){
-        binding.marketsRecyclerview.visibility= View.INVISIBLE
+    fun showOverview() {
+        binding.marketsRecyclerview.visibility = View.INVISIBLE
         binding.overviewDisplay.visibility = View.VISIBLE
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
-        val assetCall: Call<AssetSingle?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
-            CoinApiInterface::class.java
-        ).getAssetSingle(assetId)
+        val assetCall: Call<AssetSingle?> = coinCapInstance.getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {
             @SuppressLint("SetTextI18n")
             override fun onResponse(call: Call<AssetSingle?>, response: Response<AssetSingle?>) {
@@ -138,15 +152,14 @@ class DetailFragment : Fragment() {
         baseId: String,
         quoteId: String,
     ) {
-        val assetCall: Call<Candles?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
-            CoinApiInterface::class.java
-        ).getCandleList(exchange, interval, baseId, quoteId)
+        val assetCall: Call<Candles?> =
+            coinCapInstance.getCandleList(exchange, interval, baseId, quoteId)
         assetCall.enqueue(object : Callback<Candles?> {
             override fun onResponse(call: Call<Candles?>, response: Response<Candles?>) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     candleListResult.clear()
                     candleListResult =
-                        response.body()!!.data.takeLast(30) as MutableList<CandlesData>
+                        response.body()!!.data.takeLast(20) as MutableList<CandlesData>
 
                     for (i in candleListResult.indices) {
                         entriesData.add(CandleEntry(
@@ -169,16 +182,14 @@ class DetailFragment : Fragment() {
         })
     }
 
-    private fun retrieveMarketListJson(
-        coinId: String,
-    ) {
-        val assetCall: Call<List<MarketList>?> = CoinStatsRetrofitInstance.coinStatsRetrofitInstance!!.create(
-            CoinApiInterface::class.java
-        ).getMarketList(coinId)
+    private fun retrieveMarketListJson(coinId: String) {
+        val assetCall: Call<List<MarketList>?> = coinStatsInstance.getMarketList(coinId)
         assetCall.enqueue(object : Callback<List<MarketList>?> {
-            override fun onResponse(call: Call<List<MarketList>?>, response: Response<List<MarketList>?>) {
+            override fun onResponse(
+                call: Call<List<MarketList>?>,
+                response: Response<List<MarketList>?>,
+            ) {
                 if (response.isSuccessful && response.body() != null) {
-
                     marketListResult.clear()
                     marketListResult = response.body()!! as MutableList<MarketList>
                     adapter = MarketAdapter()
@@ -196,14 +207,14 @@ class DetailFragment : Fragment() {
     }
 
     private fun roundOffPriceUsd(num: String): String {
-        if (num.isNullOrEmpty()) return "0.0"
+        if (num.isEmpty()) return "0.0"
         val number = num.toFloat()
         val pattern = DecimalFormat("###.##")
         return "$symbol${pattern.format(number).toDouble()}"
     }
 
     private fun roundOffChange24Hr(num: String): Double {
-        if (num.isNullOrEmpty()) return 0.0
+        if (num.isEmpty()) return 0.0
         val number = num.toFloat()
         val pattern = DecimalFormat("###.##")
         return pattern.format(number).toDouble()

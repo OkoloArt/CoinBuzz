@@ -58,7 +58,7 @@ class ExchangeFragment : Fragment() {
     private fun retrieveExchangeListJson() {
         coinViewModel.responseExchange.observe(viewLifecycleOwner){ exchanges ->
             exchanges?.let {
-                exchangeResultList = exchanges?.data as MutableList<ExchangeList>
+                exchangeResultList = exchanges.data as MutableList<ExchangeList>
                 adapter = ExchangeListAdapter()
                 adapter.submitList(exchangeResultList)
                 binding.exchangeListRecyclerview.layoutManager = LinearLayoutManager(

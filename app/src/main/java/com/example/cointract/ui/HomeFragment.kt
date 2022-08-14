@@ -14,6 +14,7 @@ import com.example.cointract.adapter.HomePagerAdapter
 import com.example.cointract.databinding.FragmentHomeBinding
 import com.example.cointract.datastore.SettingsManager
 import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.android.ext.android.inject
 import kotlin.system.exitProcess
 
 class HomeFragment : Fragment() {
@@ -29,7 +30,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var pagerAdapter: HomePagerAdapter
-    private lateinit var settingsManager: SettingsManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,7 +45,6 @@ class HomeFragment : Fragment() {
 
 
         pagerAdapter = HomePagerAdapter(requireActivity())
-        settingsManager = SettingsManager(requireContext())
         binding.apply {
             viewPager.adapter = pagerAdapter
             viewPager.isUserInputEnabled = false
@@ -57,7 +56,6 @@ class HomeFragment : Fragment() {
         }.attach()
 
         handleOnBackPressed()
-        observeData()
     }
 
     private fun handleOnBackPressed(){
@@ -69,20 +67,5 @@ class HomeFragment : Fragment() {
                     exitProcess(0)
                 }
             })
-    }
-
-    private fun observeData() {
-
-        // Updates LauchScreen selection
-        // every time user changes it, it will be observed by preferenceLaunchScreenFlow
-//        settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
-//          Toast.makeText(requireContext(),"screen: $it",Toast.LENGTH_SHORT).show()
-//        }
-
-        // Updates DayNight selection
-        // every time user changes it, it will be observed by preferenceDayNightFlow
-        settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
-
-        }
     }
 }

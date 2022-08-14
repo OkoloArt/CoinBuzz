@@ -35,6 +35,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileImage: ImageView
     private lateinit var displayName: TextView
 
-    private lateinit var settingsManager: SettingsManager
+    private val settingsManager by inject<SettingsManager>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +56,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
-
-        settingsManager = SettingsManager(this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -68,14 +67,28 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_home), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
 //        navView.setupWithNavController(navController)
-        navView.setNavigationItemSelectedListener { menuItem ->
-            // Handle menu item selected
-            if (menuItem.itemId == R.id.nav_settings) {
-                navController.navigate(R.id.action_nav_home_to_nav_settings)
-            }
-            drawerLayout.close()
-            true
+        navigationSelectedListener(navView, navController, drawerLayout)
+
+        destinationChangeListener(navController)
+
+        bottomNavigationView(navController)
+
+        val header = navView.getHeaderView(0)
+        profileImage = header.findViewById(R.id.profile_image)
+        profileImage.setOnClickListener {
+            setProfileImage()
         }
+
+        displayName = header.findViewById(R.id.display_name)
+        displayName.setOnClickListener {
+            showDialog()
+        }
+
+        updateData()
+
+    }
+
+    private fun destinationChangeListener(navController: NavController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.nav_home -> {
@@ -97,7 +110,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
+    private fun bottomNavigationView(navController: NavController) {
         binding.appBarMain.bottomNavigation.setOnItemSelectedListener { id ->
             when (id.itemId) {
                 R.id.home -> {
@@ -111,22 +126,24 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+    }
 
-        val header = navView.getHeaderView(0)
-        profileImage = header.findViewById(R.id.profile_image)
-        profileImage.setOnClickListener {
-            setProfileImage()
+    private fun navigationSelectedListener(navView: NavigationView,navController: NavController,drawerLayout: DrawerLayout){
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Handle menu item selected
+            if (menuItem.itemId == R.id.nav_settings) {
+                val action = HomeFragmentDirections.actionNavHomeToNavSettings()
+                navController.navigate(action)
+            }
+            drawerLayout.close()
+            true
         }
+    }
 
-        displayName = header.findViewById(R.id.display_name)
-        displayName.setOnClickListener {
-            showDialog()
-        }
-
+    private fun updateData() {
         settingsManager.preferenceProfileImageFlow.asLiveData().observe(this) {
             if (it.equals("")) {
                 profileImage.setImageResource(R.drawable.ic_indicator_person)
-                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_indicator_person)
             } else {
                 profileImage.setImageURI(Uri.parse(it))
             }
@@ -136,17 +153,10 @@ class MainActivity : AppCompatActivity() {
             displayName.text = it
         }
 
-
     }
 
     private fun NavController.safeNavigate(direction: NavDirections) {
         currentDestination?.getAction(direction.actionId)?.run { navigate(direction) }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +24,9 @@ import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInst
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.core.qualifier.named
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +48,7 @@ class AssetsFragment : Fragment() {
     var assetsResultList = mutableListOf<AssetList>(
     )
 
-    private val coinViewModel: CoinViewModel by activityViewModels()
+    private val coinViewModel by sharedViewModel<CoinViewModel>()
 
     private var priceUsd = ""
     private var marketCap = ""
@@ -56,8 +58,8 @@ class AssetsFragment : Fragment() {
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
     private val symbol = numberFormat.currency?.symbol
 
-    var bitcoinData = arrayListOf<String>()
-    var index = 0
+    private var bitcoinData = arrayListOf<String>()
+    private var index = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,14 +75,9 @@ class AssetsFragment : Fragment() {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                retrieveAssetListJson()
-                retrieveAssetSingleJson(BITCOIN)
-                retrieveAssetSingleJson(ETHEREUM)
-                retrieveAssetSingleJson(TETHER)
-
+               showData()
                 Timer().scheduleAtFixedRate(object : TimerTask() {
                     override fun run() {
-                        retrieveAssetListJson()
                         retrieveAssetSingleJson(BITCOIN)
                         retrieveAssetSingleJson(ETHEREUM)
                         retrieveAssetSingleJson(TETHER)
@@ -90,33 +87,34 @@ class AssetsFragment : Fragment() {
         }
     }
 
+    private fun showData(){
+        Handler(Looper.getMainLooper()).post {
+            retrieveAssetListJson()
+        }
+        retrieveAssetSingleJson(BITCOIN)
+        retrieveAssetSingleJson(ETHEREUM)
+        retrieveAssetSingleJson(TETHER)
+    }
+
     private fun retrieveAssetListJson() {
-        val assetCall: Call<AssetsList?> = coinCapRetrofitInstance!!.create(
-            CoinApiInterface::class.java
-        ).getAssetList()
-        assetCall.enqueue(object : Callback<AssetsList?> {
-            override fun onResponse(call: Call<AssetsList?>, response: Response<AssetsList?>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-
-                    assetsResultList.clear()
-                    assetsResultList = response.body()?.data as MutableList<AssetList>
-                    assetsResultList.subList(0, 3).clear()
-                    adapter = AssetListAdapter {
-                        coinViewModel.setAssetId(it.assetId)
-                        findNavController().navigate(R.id.action_nav_home_to_detailFragment)
-                    }
-                    adapter.submitList(assetsResultList)
-                    binding.assetsListRecyclerview.layoutManager = LinearLayoutManager(
-                        requireContext(),
-                        LinearLayoutManager.VERTICAL, false
-                    )
-                    binding.assetsListRecyclerview.adapter = adapter
+        coinViewModel.responseAssetList.observe(viewLifecycleOwner) { assetList ->
+            assetList?.let {
+                adapter = AssetListAdapter {
+                    coinViewModel.setAssetId(it.assetId)
+                    val action = HomeFragmentDirections.actionNavHomeToDetailFragment()
+                    findNavController().navigate(action)
                 }
+                val toIndex = assetList.data.size
+                assetsResultList = assetList.data.subList(3, toIndex) as MutableList<AssetList>
+                adapter.submitList(assetsResultList)
+                binding.assetsListRecyclerview.layoutManager = LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL, false
+                )
+                binding.assetsListRecyclerview.adapter = adapter
             }
+        }
 
-            override fun onFailure(call: Call<AssetsList?>, t: Throwable) {
-            }
-        })
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
