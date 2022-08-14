@@ -20,9 +20,6 @@ class NewsAdapter: ListAdapter<NewsList, NewsAdapter.NewsListViewHolder>(DiffCal
     class NewsListViewHolder(private val binding: NewsListDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val numberFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
-        private val symbol = numberFormat.currency?.symbol
-
         @SuppressLint("SetTextI18n")
         fun bind(newsList: NewsList) {
             binding.newsTitle.text = newsList.news_title

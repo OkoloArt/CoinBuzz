@@ -45,5 +45,5 @@
         android:gravity="center"
         android:layout_alignParentEnd="true"
         android:layout_height="60dp"
-        app:srcCompat="@drawable/crypto"/>
+        app:srcCompat="@mipmap/crypto"/>
 </RelativeLayout>

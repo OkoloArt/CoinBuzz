@@ -1,20 +1,22 @@
 package com.example.cointract.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.adapter.ExchangeListAdapter
 import com.example.cointract.databinding.FragmentExchangeBinding
+import com.example.cointract.model.CoinViewModel
 import com.example.cointract.model.ExchangeList
-import com.example.cointract.model.Exchanges
-import com.example.cointract.network.CoinApiInterface
-import com.example.cointract.network.CoinCapRetrofitInstance
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 /**
  * A simple [Fragment] subclass.
@@ -30,6 +32,8 @@ class ExchangeFragment : Fragment() {
     var exchangeResultList = mutableListOf<ExchangeList>(
     )
 
+    private val coinViewModel by sharedViewModel<CoinViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -42,32 +46,27 @@ class ExchangeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        retrieveExchangeListJson()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                Handler(Looper.getMainLooper()).post {
+                    retrieveExchangeListJson()
+                }
+            }
+        }
     }
 
     private fun retrieveExchangeListJson() {
-        val assetCall: Call<Exchanges?> = CoinCapRetrofitInstance.coinCapRetrofitInstance!!.create(
-            CoinApiInterface::class.java
-        ).getExchangeList()
-        assetCall.enqueue(object : Callback<Exchanges?> {
-            override fun onResponse(call: Call<Exchanges?>, response: Response<Exchanges?>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-
-                    exchangeResultList.clear()
-                    exchangeResultList = response.body()?.data as MutableList<ExchangeList>
-
-                    adapter = ExchangeListAdapter()
-                    adapter.submitList(exchangeResultList)
-                    binding.exchangeListRecyclerview.layoutManager = LinearLayoutManager(
-                        requireContext(),
-                        LinearLayoutManager.VERTICAL, false
-                    )
-                    binding.exchangeListRecyclerview.adapter = adapter
-                }
+        coinViewModel.responseExchange.observe(viewLifecycleOwner){ exchanges ->
+            exchanges?.let {
+                exchangeResultList = exchanges?.data as MutableList<ExchangeList>
+                adapter = ExchangeListAdapter()
+                adapter.submitList(exchangeResultList)
+                binding.exchangeListRecyclerview.layoutManager = LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL, false
+                )
+                binding.exchangeListRecyclerview.adapter = adapter
             }
-
-            override fun onFailure(call: Call<Exchanges?>, t: Throwable) {
-            }
-        })
+        }
     }
 }

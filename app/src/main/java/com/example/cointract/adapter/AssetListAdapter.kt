@@ -55,10 +55,10 @@ class AssetListAdapter( private val onItemClicked: (AssetList) -> Unit ) :
         private fun setChange24HrImage(imageView: ImageView, num: String) {
             when {
                 roundOffChange24Hr(num) < 0 -> {
-                    imageView.setImageResource(R.drawable.arrow_down)
+                    imageView.setImageResource(R.mipmap.arrow_down)
                 }
                 roundOffChange24Hr(num) > 0 -> {
-                    imageView.setImageResource(R.drawable.arrow_up)
+                    imageView.setImageResource(R.mipmap.arrow_up)
                 }
             }
         }

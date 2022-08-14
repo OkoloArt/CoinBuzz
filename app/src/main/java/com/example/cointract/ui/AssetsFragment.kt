@@ -11,9 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.R
@@ -22,10 +22,9 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
 import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInstance
-import com.example.cointract.utils.ConnectivityObserver
-import com.example.cointract.utils.NetworkConnectivityObserver
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,6 +56,9 @@ class AssetsFragment : Fragment() {
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
     private val symbol = numberFormat.currency?.symbol
 
+    var bitcoinData = arrayListOf<String>()
+    var index = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -69,17 +71,23 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        retrieveAssetListJson()
-        retrieveAssetSingleJson(BITCOIN)
-        retrieveAssetSingleJson(ETHEREUM)
-        retrieveAssetSingleJson(TETHER)
-
-        Timer().scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
                 retrieveAssetListJson()
-            }
-        }, 0, 5000)
+                retrieveAssetSingleJson(BITCOIN)
+                retrieveAssetSingleJson(ETHEREUM)
+                retrieveAssetSingleJson(TETHER)
 
+                Timer().scheduleAtFixedRate(object : TimerTask() {
+                    override fun run() {
+                        retrieveAssetListJson()
+                        retrieveAssetSingleJson(BITCOIN)
+                        retrieveAssetSingleJson(ETHEREUM)
+                        retrieveAssetSingleJson(TETHER)
+                    }
+                }, 0, 10000)
+            }
+        }
     }
 
     private fun retrieveAssetListJson() {
@@ -132,7 +140,7 @@ class AssetsFragment : Fragment() {
                             setUpTextSwitcher()
                         }
                         "ethereum" -> {
-                            binding.leftAssetIcon.setImageResource(R.drawable.ethereum)
+                            binding.leftAssetIcon.setImageResource(R.mipmap.ethereum)
                             binding.leftAssetName.text = response.body()!!.data.assetName
                             binding.leftAssetSymbol.text = response.body()!!.data.assetSymbol
                             binding.leftAssetChange24Hr.text =
@@ -147,7 +155,7 @@ class AssetsFragment : Fragment() {
                                 "${roundOffChange24Hr(response.body()!!.data.assetChange24Hr)}%"
                             binding.rightAssetPriceUsd.text =
                                 roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
-                            binding.rightAssetIcon.setImageResource(R.drawable.tether)
+                            binding.rightAssetIcon.setImageResource(R.mipmap.tether)
                         }
                     }
                 }
@@ -171,8 +179,10 @@ class AssetsFragment : Fragment() {
     }
 
     private fun setUpTextSwitcher() {
-        val bitcoinData = arrayOf(priceUsd, marketCap, change24H, volume24H)
-        var index = 0
+        bitcoinData.clear()
+        bitcoinData = arrayListOf(priceUsd, marketCap, change24H, volume24H)
+
+        binding.textSwitcher.removeAllViews()
         binding.textSwitcher.setFactory {
             val textView = TextView(requireContext())
             textView.gravity = Gravity.CENTER_HORIZONTAL
@@ -192,14 +202,17 @@ class AssetsFragment : Fragment() {
             outAnimation = textOut
         }
 
-        Timer().scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                Handler(Looper.getMainLooper()).post {
-                    index = if (index + 1 < bitcoinData.size) index + 1 else 0
-                    binding.textSwitcher.setText(bitcoinData[index])
-                }
-            }
-        }, 0, 5000)
+        index = if (index + 1 < bitcoinData.size) index + 1 else 0
+        binding.textSwitcher.setText(bitcoinData[index])
+
+//        Timer().scheduleAtFixedRate(object : TimerTask() {
+//            override fun run() {
+//                Handler(Looper.getMainLooper()).post {
+//                    index = if (index + 1 < bitcoinData.size) index + 1 else 0
+//                    binding.textSwitcher.setText(bitcoinData[index])
+//                }
+//            }
+//        }, 0, 5000)
     }
 
     private fun roundOffMCap(num: String): String {

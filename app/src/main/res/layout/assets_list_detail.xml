@@ -8,7 +8,7 @@
         android:id="@+id/asset_icon"
         android:layout_width="50dp"
         android:layout_height="60dp"
-        app:srcCompat="@drawable/bitcoin" />
+        app:srcCompat="@mipmap/bitcoin" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
                 android:id="@+id/asset_indicator"
                 android:layout_width="18dp"
                 android:layout_height="30dp"
-                app:srcCompat="@drawable/arrow_up" />
+                app:srcCompat="@mipmap/arrow_up" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/asset_change24hr"

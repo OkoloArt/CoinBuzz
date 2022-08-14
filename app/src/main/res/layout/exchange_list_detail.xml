@@ -46,7 +46,7 @@
                 android:id="@+id/exchange_indicator"
                 android:layout_width="18dp"
                 android:layout_height="30dp"
-                app:srcCompat="@drawable/arrow_up" />
+                app:srcCompat="@mipmap/arrow_up" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/exchange_volume"
