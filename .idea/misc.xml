@@ -3,7 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/btn_blue_normal.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/btn_blue_pressed.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/btn_blue_selector.xml" value="0.172" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/ic_indicator_person.xml" value="0.1575" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/layout_rounded_top_white.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/onboard_viewpager_selector_blue.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/onboarding_selected_dot_white.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/onboarding_unselected_dot_white.xml" value="0.172" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/drawable/onboarding_viewpager_selector_white.xml" value="0.172" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/app_bar_main.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/assets_list_detail.xml" value="0.33" />
@@ -14,7 +22,11 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_detail.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_exchange.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_home.xml" value="0.25" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_home_onboard.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_news.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_onboard.xml" value="0.13272543059777103" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_onboarding.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_onboarding2.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_settings.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/fragment_splash.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/CoinTract/app/src/main/res/layout/market_list_detail.xml" value="0.33" />
