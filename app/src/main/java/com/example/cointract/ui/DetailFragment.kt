@@ -1,8 +1,12 @@
 package com.example.cointract.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,12 +15,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.databinding.FragmentDetailBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
+import com.example.cointract.utils.NetworkConnectivityObserver
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
@@ -61,6 +67,7 @@ class DetailFragment : Fragment() {
 
     private lateinit var adapter: MarketAdapter
     private var coinId = ""
+    private val connectivityObserver by inject<NetworkConnectivityObserver>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,23 +83,7 @@ class DetailFragment : Fragment() {
 
         candleStickChart = binding.candleData
 
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-
-                Handler(Looper.getMainLooper()).post {
-                    coinViewModel.assetId.observe(viewLifecycleOwner) {
-                        it?.let {
-                            coinId = it
-                            retrieveAssetSingleJson(coinId)
-                            retrieveCandleListJson(EXCHANGE, FOUR_HOUR, coinId, QUOTE_ID)
-                            retrieveMarketListJson(coinId)
-                        }
-                    }
-                }
-                loadCandleStickChartData()
-                setUpCandleStickChart()
-            }
-        }
+        observeNetwork()
 
         binding.apply {
             detailFragment = this@DetailFragment
@@ -101,15 +92,77 @@ class DetailFragment : Fragment() {
 
     }
 
-    fun showMarkets() {
-        binding.marketsRecyclerview.visibility = View.VISIBLE
-        binding.overviewDisplay.visibility = View.INVISIBLE
+    private fun observeNetwork() {
+        connectivityObserver.observeNetworkStatus().asLiveData()
+            .observe(viewLifecycleOwner) {
+                it?.let {
+                    if (it.name == "Lost") {
+                        binding.loading.visibility = View.INVISIBLE
+                        binding.overviewDisplay.visibility = View.INVISIBLE
+                        binding.marketsRecyclerview.visibility = View.INVISIBLE
+                        binding.noInternetConnection.visibility = View.VISIBLE
+                    } else {
+                        binding.loading.visibility = View.VISIBLE
+                        binding.noInternetConnection.visibility = View.INVISIBLE
+                        binding.overviewDisplay.visibility = View.INVISIBLE
+                        binding.marketsRecyclerview.visibility = View.INVISIBLE
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
 
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    coinViewModel.assetId.observe(viewLifecycleOwner) { id ->
+                                        id?.let {
+                                            coinId = id
+                                            retrieveAssetSingleJson(coinId)
+                                            retrieveCandleListJson(
+                                                FOUR_HOUR,
+                                                coinId)
+                                        }
+                                    }
+                                }, 6000)
+                                loadCandleStickChartData()
+                                setUpCandleStickChart()
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    fun showMarkets() {
+
+        if (checkForInternet(requireContext())) {
+            binding.loading.visibility = View.VISIBLE
+            binding.overviewDisplay.visibility = View.INVISIBLE
+            binding.noInternetConnection.visibility = View.INVISIBLE
+            Handler(Looper.getMainLooper()).postDelayed({
+                retrieveMarketListJson(coinId)
+            }, 6000)
+        } else {
+            binding.loading.visibility = View.INVISIBLE
+            binding.overviewDisplay.visibility = View.INVISIBLE
+            binding.marketsRecyclerview.visibility = View.INVISIBLE
+            binding.noInternetConnection.visibility = View.VISIBLE
+        }
     }
 
     fun showOverview() {
-        binding.marketsRecyclerview.visibility = View.INVISIBLE
-        binding.overviewDisplay.visibility = View.VISIBLE
+
+        if (checkForInternet(requireContext())) {
+            binding.loading.visibility = View.VISIBLE
+            binding.noInternetConnection.visibility = View.INVISIBLE
+            binding.marketsRecyclerview.visibility = View.INVISIBLE
+            Handler(Looper.getMainLooper()).postDelayed({
+                retrieveAssetSingleJson(coinId)
+                retrieveCandleListJson(FOUR_HOUR, coinId)
+            }, 6000)
+
+        } else {
+            binding.loading.visibility = View.INVISIBLE
+            binding.overviewDisplay.visibility = View.INVISIBLE
+            binding.marketsRecyclerview.visibility = View.INVISIBLE
+            binding.noInternetConnection.visibility = View.VISIBLE
+        }
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
@@ -120,6 +173,8 @@ class DetailFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
 
                     binding.apply {
+                        loading.visibility = View.INVISIBLE
+                        overviewDisplay.visibility = View.VISIBLE
                         assetName.text = response.body()!!.data.assetName
                         assetPriceUsd.text =
                             roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
@@ -146,14 +201,10 @@ class DetailFragment : Fragment() {
         })
     }
 
-    private fun retrieveCandleListJson(
-        exchange: String,
-        interval: String,
-        baseId: String,
-        quoteId: String,
+    private fun retrieveCandleListJson(interval: String, baseId: String
     ) {
         val assetCall: Call<Candles?> =
-            coinCapInstance.getCandleList(exchange, interval, baseId, quoteId)
+            coinCapInstance.getCandleList(EXCHANGE, interval, baseId, QUOTE_ID)
         assetCall.enqueue(object : Callback<Candles?> {
             override fun onResponse(call: Call<Candles?>, response: Response<Candles?>) {
                 if (response.isSuccessful && response.body()?.data != null) {
@@ -190,6 +241,8 @@ class DetailFragment : Fragment() {
                 response: Response<List<MarketList>?>,
             ) {
                 if (response.isSuccessful && response.body() != null) {
+                    binding.loading.visibility = View.INVISIBLE
+                    binding.marketsRecyclerview.visibility = View.VISIBLE
                     marketListResult.clear()
                     marketListResult = response.body()!! as MutableList<MarketList>
                     adapter = MarketAdapter()
@@ -236,37 +289,40 @@ class DetailFragment : Fragment() {
 
     private fun setUpCandleStickChart() {
 
-        candleStickChart.apply {
-            isHighlightPerDragEnabled = true
-            setDrawBorders(false)
-            setBackgroundColor(Color.BLACK)
-            setBorderColor(Color.GRAY)
-            setVisibleXRange(20f, 20f)
-            description = null
-            moveViewToX(entriesData.size.toFloat())
-            setMaxVisibleValueCount(50)
-            requestDisallowInterceptTouchEvent(true)
+        Handler(Looper.getMainLooper()).post {
+            candleStickChart.apply {
+                isHighlightPerDragEnabled = true
+                setDrawBorders(false)
+                setBackgroundColor(Color.BLACK)
+                setBorderColor(Color.GRAY)
+                setVisibleXRange(20f, 20f)
+                description = null
+                moveViewToX(entriesData.size.toFloat())
+                setMaxVisibleValueCount(50)
+                requestDisallowInterceptTouchEvent(true)
+            }
+
+            val yAxis = candleStickChart.axisLeft
+            val rightAxis = candleStickChart.axisRight
+            yAxis.setDrawGridLines(false)
+            rightAxis.setDrawGridLines(false)
+
+            val xAxis = candleStickChart.xAxis
+
+            xAxis.setDrawGridLines(false) // disable x axis grid lines
+            xAxis.setDrawLabels(false)
+            rightAxis.textColor = Color.WHITE
+            yAxis.labelCount = 4
+            xAxis.labelCount = 4
+            yAxis.setDrawLabels(false)
+            xAxis.granularity = 1f
+            xAxis.isGranularityEnabled = true
+            xAxis.setAvoidFirstLastClipping(true)
+
+            val l = candleStickChart.legend
+            l.isEnabled = false
         }
 
-        val yAxis = candleStickChart.axisLeft
-        val rightAxis = candleStickChart.axisRight
-        yAxis.setDrawGridLines(false)
-        rightAxis.setDrawGridLines(false)
-
-        val xAxis = candleStickChart.xAxis
-
-        xAxis.setDrawGridLines(false) // disable x axis grid lines
-        xAxis.setDrawLabels(false)
-        rightAxis.textColor = Color.WHITE
-        yAxis.labelCount = 4
-        xAxis.labelCount = 4
-        yAxis.setDrawLabels(false)
-        xAxis.granularity = 1f
-        xAxis.isGranularityEnabled = true
-        xAxis.setAvoidFirstLastClipping(true)
-
-        val l = candleStickChart.legend
-        l.isEnabled = false
     }
 
     private fun loadCandleStickChartData() {
@@ -299,19 +355,59 @@ class DetailFragment : Fragment() {
     }
 
     fun oneHourChart(baseId: String) {
-        retrieveCandleListJson(EXCHANGE, ONE_HOUR, baseId, QUOTE_ID)
+        retrieveCandleListJson(ONE_HOUR, baseId)
     }
 
     fun fourHourChart(baseId: String) {
-        retrieveCandleListJson(EXCHANGE, FOUR_HOUR, baseId, QUOTE_ID)
+        retrieveCandleListJson(FOUR_HOUR, baseId)
     }
 
     fun eightHourChart(baseId: String) {
-        retrieveCandleListJson(EXCHANGE, EIGHT_HOUR, baseId, QUOTE_ID)
+        retrieveCandleListJson(EIGHT_HOUR, baseId)
     }
 
     fun oneDayChart(baseId: String) {
-        retrieveCandleListJson(EXCHANGE, ONE_DAY, baseId, QUOTE_ID)
+        retrieveCandleListJson(ONE_DAY, baseId)
+    }
+
+    private fun checkForInternet(context: Context): Boolean {
+
+        // register activity with the connectivity manager service
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // if the android version is equal to M
+        // or greater we need to use the
+        // NetworkCapabilities to check what type of
+        // network has the internet connection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            // Returns a Network object corresponding to
+            // the currently active default data network.
+            val network = connectivityManager.activeNetwork ?: return false
+
+            // Representation of the capabilities of an active network.
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+                // Indicates this network uses a Wi-Fi transport,
+                // or WiFi has network connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+
+                // Indicates this network uses a Cellular transport. or
+                // Cellular has network connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+
+                // else return false
+                else -> false
+            }
+        } else {
+            // if the android version is below M
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
     }
 
     companion object {

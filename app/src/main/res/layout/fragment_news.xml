@@ -7,9 +7,31 @@
     tools:context=".ui.NewsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:visibility="invisible"
         android:id="@+id/news_list_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:scrollbars="none" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/no_internet_connection"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:visibility="invisible"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/black_no_internet_connection" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/black_loading" />
 </RelativeLayout>

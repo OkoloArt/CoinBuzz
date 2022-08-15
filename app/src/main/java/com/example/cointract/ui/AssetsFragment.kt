@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,12 +22,12 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
 import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInstance
+import com.example.cointract.utils.NetworkConnectivityObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.core.qualifier.named
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -75,7 +76,10 @@ class AssetsFragment : Fragment() {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-               showData()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    showData()
+                }, 6000)
+
                 Timer().scheduleAtFixedRate(object : TimerTask() {
                     override fun run() {
                         retrieveAssetSingleJson(BITCOIN)
@@ -87,10 +91,8 @@ class AssetsFragment : Fragment() {
         }
     }
 
-    private fun showData(){
-        Handler(Looper.getMainLooper()).post {
-            retrieveAssetListJson()
-        }
+    private fun showData() {
+        retrieveAssetListJson()
         retrieveAssetSingleJson(BITCOIN)
         retrieveAssetSingleJson(ETHEREUM)
         retrieveAssetSingleJson(TETHER)
@@ -99,6 +101,8 @@ class AssetsFragment : Fragment() {
     private fun retrieveAssetListJson() {
         coinViewModel.responseAssetList.observe(viewLifecycleOwner) { assetList ->
             assetList?.let {
+                binding.loading.visibility = View.INVISIBLE
+                binding.mainLayout.visibility = View.VISIBLE
                 adapter = AssetListAdapter {
                     coinViewModel.setAssetId(it.assetId)
                     val action = HomeFragmentDirections.actionNavHomeToDetailFragment()

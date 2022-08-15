@@ -1,12 +1,15 @@
 package com.example.cointract.ui
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -15,8 +18,6 @@ import com.example.cointract.adapter.NewsAdapter
 import com.example.cointract.databinding.FragmentNewsBinding
 import com.example.cointract.model.CoinViewModel
 import com.example.cointract.model.NewsList
-import com.example.cointract.network.CoinApiInterface
-import com.example.cointract.utils.ConnectivityObserver
 import com.example.cointract.utils.NetworkConnectivityObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,16 +52,41 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            Handler(Looper.getMainLooper()).post {
-                retrieveNewsListJson()
-            }
+        if (checkForInternet(requireContext())) {
+            binding.loading.visibility=View.VISIBLE
+            binding.noInternetConnection.visibility = View.INVISIBLE
+        } else {
+            binding.loading.visibility=View.INVISIBLE
+            binding.newsListRecyclerview.visibility = View.INVISIBLE
+            binding.noInternetConnection.visibility = View.VISIBLE
         }
+
+        connectivityObserver.observeNetworkStatus().asLiveData()
+            .observe(viewLifecycleOwner) {
+                it?.let {
+                    if (it.name == "Lost") {
+                        binding.loading.visibility=View.INVISIBLE
+                        binding.newsListRecyclerview.visibility = View.INVISIBLE
+                        binding.noInternetConnection.visibility = View.VISIBLE
+                    } else {
+                     //   binding.newsListRecyclerview.visibility = View.VISIBLE
+                        binding.loading.visibility=View.VISIBLE
+                        binding.noInternetConnection.visibility = View.INVISIBLE
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                retrieveNewsListJson()
+                            }, 6000)
+                        }
+                    }
+                }
+            }
     }
 
     private fun retrieveNewsListJson() {
         coinViewModel.responseNews.observe(viewLifecycleOwner) { news ->
             news?.let {
+                binding.loading.visibility = View.INVISIBLE
+                binding.newsListRecyclerview.visibility = View.VISIBLE
                 newsListResult = news.news as MutableList<NewsList>
                 adapter = NewsAdapter()
                 adapter.submitList(newsListResult)
@@ -71,10 +97,45 @@ class NewsFragment : Fragment() {
                 binding.newsListRecyclerview.adapter = adapter
             }
         }
+    }
 
-        connectivityObserver.observeNetworkStatus().asLiveData()
-            .observe(viewLifecycleOwner) {
-                Toast.makeText(requireContext(), "Status: $it", Toast.LENGTH_SHORT).show()
+    private fun checkForInternet(context: Context): Boolean {
+
+        // register activity with the connectivity manager service
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // if the android version is equal to M
+        // or greater we need to use the
+        // NetworkCapabilities to check what type of
+        // network has the internet connection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            // Returns a Network object corresponding to
+            // the currently active default data network.
+            val network = connectivityManager.activeNetwork ?: return false
+
+            // Representation of the capabilities of an active network.
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+                // Indicates this network uses a Wi-Fi transport,
+                // or WiFi has network connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+
+                // Indicates this network uses a Cellular transport. or
+                // Cellular has network connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+
+                // else return false
+                else -> false
             }
+        } else {
+            // if the android version is below M
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
     }
 }
