@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -21,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSplashBinding
 import com.example.cointract.datastore.SettingsManager
+import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
 
 /**
@@ -33,7 +35,7 @@ class SplashFragment : Fragment() {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var settingsManager: SettingsManager
+    private val settingsManager by inject<SettingsManager>()
     private var dayNightMode = false
     private var biometricMode = false
 
@@ -55,7 +57,6 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        settingsManager = SettingsManager(requireContext())
         binding.apply {
             splashFragment = this@SplashFragment
         }
@@ -69,20 +70,27 @@ class SplashFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun goToNextScreen() {
-//        if (dayNightMode){
-//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-//        }else{
-//            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-//        }
+//        setDayNightTheme()
+//        showBiometricPrompt()
+        val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun setDayNightTheme(){
+        if (dayNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+
+    private fun showBiometricPrompt(){
         if (biometricMode && isBiometricFeatureAvailable()) {
             // Prompt appears when user chooses Biometric mode .
             // Consider integrating with the keystore to unlock cryptographic operations,
             // if needed by your app.
             biometricPrompt.authenticate(promptInfo)
         }else{
-            Toast.makeText(requireContext(),
-                "BiometricMode: ${isBiometricFeatureAvailable()} $biometricMode", Toast.LENGTH_SHORT)
-                .show()
             findNavController().navigate(R.id.action_splashFragment_to_nav_home)
         }
     }
@@ -136,10 +144,8 @@ class SplashFragment : Fragment() {
                 override fun onAuthenticationSucceeded(
                     result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    Toast.makeText(requireContext(),
-                        "Authentication succeeded!", Toast.LENGTH_SHORT)
-                        .show()
-                    findNavController().navigate(R.id.action_splashFragment_to_nav_home)
+                    val action = SplashFragmentDirections.actionSplashFragmentToNavHome()
+                    findNavController().navigate(action)
                 }
 
                 override fun onAuthenticationFailed() {

@@ -54,7 +54,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_create_account"
+            android:id="@+id/btn_got_to_next_screen"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="20dp"

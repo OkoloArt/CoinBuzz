@@ -4,14 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.adapter.OnBoardPagerAdapter
 import com.example.cointract.databinding.FragmentHomeOnboardBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import com.zhpan.indicator.enums.IndicatorSlideMode
 import com.zhpan.indicator.enums.IndicatorStyle
+import kotlin.system.exitProcess
 
 /**
  * A simple [Fragment] subclass.
@@ -48,5 +51,22 @@ class HomeOnboardFragment : Fragment() {
             setupWithViewPager(binding.viewPager)
         }
         binding.viewPager.offscreenPageLimit = 1
+        binding.btnGotToNextScreen.setOnClickListener {
+            val action = HomeOnboardFragmentDirections.actionHomeOnboardFragmentToNavHome()
+            findNavController().navigate(action)
+        }
+
+        handleOnBackPressed()
+    }
+
+    private fun handleOnBackPressed(){
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    activity!!.finish()
+                    exitProcess(0)
+                }
+            })
     }
 }
