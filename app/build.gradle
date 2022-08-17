@@ -77,6 +77,8 @@ dependencies {
     // DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
+    // Lottie Animation
+    implementation "com.airbnb.android:lottie:$lottieVersion"
     // Runtime permission
     implementation 'com.karumi:dexter:6.2.3'
 
@@ -87,5 +89,9 @@ dependencies {
 
     // Biometric Authentication
     implementation "androidx.biometric:biometric:1.2.0-alpha04"
+
+    //CircleIndicator
+    implementation "com.github.zhpanvip:viewpagerindicator:1.2.1"
+
 
 }
