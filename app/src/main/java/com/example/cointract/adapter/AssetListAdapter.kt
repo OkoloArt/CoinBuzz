@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cointract.R
 import com.example.cointract.databinding.AssetsListDetailBinding
 import com.example.cointract.model.AssetList
+import com.squareup.picasso.Picasso
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="none"
     tools:context=".ui.AssetsFragment">
 
     <RelativeLayout
@@ -241,6 +242,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/title_text"
+            android:nestedScrollingEnabled="false"
             android:layout_marginTop="10dp"
             android:scrollbars="none" />
 

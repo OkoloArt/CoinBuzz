@@ -1,6 +1,7 @@
 package com.example.cointract.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +13,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,11 +22,8 @@ import com.example.cointract.databinding.FragmentAssetsBinding
 import com.example.cointract.model.*
 import com.example.cointract.network.CoinApiInterface
 import com.example.cointract.network.CoinCapRetrofitInstance.coinCapRetrofitInstance
-import com.example.cointract.utils.NetworkConnectivityObserver
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,10 +43,11 @@ class AssetsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: AssetListAdapter
-    var assetsResultList = mutableListOf<AssetList>(
+    private var assetsResultList = mutableListOf<AssetList>(
     )
 
     private val coinViewModel by sharedViewModel<CoinViewModel>()
+    private lateinit var textView: TextView
 
     private var priceUsd = ""
     private var marketCap = ""
@@ -74,8 +72,7 @@ class AssetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+        CoroutineScope(IO).launch() {
                 Handler(Looper.getMainLooper()).postDelayed({
                     showData()
                 }, 6000)
@@ -87,7 +84,6 @@ class AssetsFragment : Fragment() {
                         retrieveAssetSingleJson(TETHER)
                     }
                 }, 0, 10000)
-            }
         }
     }
 
@@ -108,6 +104,7 @@ class AssetsFragment : Fragment() {
                     val action = HomeFragmentDirections.actionNavHomeToDetailFragment()
                     findNavController().navigate(action)
                 }
+
                 val toIndex = assetList.data.size
                 assetsResultList = assetList.data.subList(3, toIndex) as MutableList<AssetList>
                 adapter.submitList(assetsResultList)
@@ -127,7 +124,10 @@ class AssetsFragment : Fragment() {
         ).getAssetSingle(assetId)
         assetCall.enqueue(object : Callback<AssetSingle?> {
             @SuppressLint("SetTextI18n")
-            override fun onResponse(call: Call<AssetSingle?>, response: Response<AssetSingle?>) {
+            override fun onResponse(
+                call: Call<AssetSingle?>,
+                response: Response<AssetSingle?>,
+            ) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     when (assetId) {
                         "bitcoin" -> {
@@ -183,10 +183,11 @@ class AssetsFragment : Fragment() {
     private fun setUpTextSwitcher() {
         bitcoinData.clear()
         bitcoinData = arrayListOf(priceUsd, marketCap, change24H, volume24H)
+        val context: Context = this.context ?: return
 
         binding.textSwitcher.removeAllViews()
         binding.textSwitcher.setFactory {
-            val textView = TextView(requireContext())
+            textView = TextView(context)
             textView.gravity = Gravity.CENTER_HORIZONTAL
             textView.textSize = 20f
             textView.setTextColor(Color.WHITE)
@@ -206,15 +207,6 @@ class AssetsFragment : Fragment() {
 
         index = if (index + 1 < bitcoinData.size) index + 1 else 0
         binding.textSwitcher.setText(bitcoinData[index])
-
-//        Timer().scheduleAtFixedRate(object : TimerTask() {
-//            override fun run() {
-//                Handler(Looper.getMainLooper()).post {
-//                    index = if (index + 1 < bitcoinData.size) index + 1 else 0
-//                    binding.textSwitcher.setText(bitcoinData[index])
-//                }
-//            }
-//        }, 0, 5000)
     }
 
     private fun roundOffMCap(num: String): String {

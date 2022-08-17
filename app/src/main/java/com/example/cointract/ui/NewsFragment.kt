@@ -83,18 +83,20 @@ class NewsFragment : Fragment() {
     }
 
     private fun retrieveNewsListJson() {
-        coinViewModel.responseNews.observe(viewLifecycleOwner) { news ->
-            news?.let {
-                binding.loading.visibility = View.INVISIBLE
-                binding.newsListRecyclerview.visibility = View.VISIBLE
-                newsListResult = news.news as MutableList<NewsList>
-                adapter = NewsAdapter()
-                adapter.submitList(newsListResult)
-                binding.newsListRecyclerview.layoutManager = LinearLayoutManager(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL, false
-                )
-                binding.newsListRecyclerview.adapter = adapter
+        if (view != null) {
+            coinViewModel.responseNews.observe(viewLifecycleOwner) { news ->
+                news?.let {
+                    binding.loading.visibility = View.INVISIBLE
+                    binding.newsListRecyclerview.visibility = View.VISIBLE
+                    newsListResult = news.news as MutableList<NewsList>
+                    adapter = NewsAdapter()
+                    adapter.submitList(newsListResult)
+                    binding.newsListRecyclerview.layoutManager = LinearLayoutManager(
+                        requireContext(),
+                        LinearLayoutManager.VERTICAL, false
+                    )
+                    binding.newsListRecyclerview.adapter = adapter
+                }
             }
         }
     }
