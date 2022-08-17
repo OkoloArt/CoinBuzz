@@ -41,4 +41,5 @@ interface CoinApiInterface {
         @Query("skip") skip: String,
         @Query("limit") limit:String
     ): Call<News?>
+
 }

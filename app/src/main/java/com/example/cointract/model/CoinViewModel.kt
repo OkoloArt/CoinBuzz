@@ -6,9 +6,13 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.network.CoinApiInterface
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -36,10 +40,6 @@ class CoinViewModel : ViewModel(), KoinComponent {
     private var _responseAssetList = MutableLiveData<AssetsList>()
     val responseAssetList: LiveData<AssetsList> get() = _responseAssetList
 
-    private var _responseMarketList = MutableLiveData<List<MarketList>>()
-    val responseMarketList: LiveData<List<MarketList>>  get() = _responseMarketList
-
-
     fun setAssetId(id: String) {
         _assetId.value = id
     }
@@ -57,44 +57,50 @@ class CoinViewModel : ViewModel(), KoinComponent {
     }
 
     private fun retrieveNewsListJson() {
-        val assetCall: Call<News?> = coinStatsInstance.getNewsList(SKIP, LIMIT)
-        assetCall.enqueue(object : Callback<News?> {
-            override fun onResponse(call: Call<News?>, response: Response<News?>) {
-                if (response.isSuccessful && response.body()?.news != null) {
-                    _responseNews.value = response.body()
+        CoroutineScope(IO).launch {
+            val assetCall: Call<News?> = coinStatsInstance.getNewsList(SKIP, LIMIT)
+            assetCall.enqueue(object : Callback<News?> {
+                override fun onResponse(call: Call<News?>, response: Response<News?>) {
+                    if (response.isSuccessful && response.body()?.news != null) {
+                        _responseNews.value = response.body()
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<News?>, t: Throwable) {
-                TODO("Not yet implemented")
-            }
-        })
+                override fun onFailure(call: Call<News?>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+            })
+        }
     }
 
     private fun retrieveExchangeListJson() {
-        val assetCall: Call<Exchanges?> =coinCapInstance.getExchangeList()
-        assetCall.enqueue(object : Callback<Exchanges?> {
-            override fun onResponse(call: Call<Exchanges?>, response: Response<Exchanges?>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    _responseExchange.value = response.body()
+        CoroutineScope(IO).launch {
+            val assetCall: Call<Exchanges?> =coinCapInstance.getExchangeList()
+            assetCall.enqueue(object : Callback<Exchanges?> {
+                override fun onResponse(call: Call<Exchanges?>, response: Response<Exchanges?>) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        _responseExchange.value = response.body()
+                    }
                 }
-            }
-            override fun onFailure(call: Call<Exchanges?>, t: Throwable) {
-            }
-        })
+                override fun onFailure(call: Call<Exchanges?>, t: Throwable) {
+                }
+            })
+        }
     }
 
     private fun retrieveAssetListJson() {
-        val assetCall: Call<AssetsList?> = coinCapInstance.getAssetList()
-        assetCall.enqueue(object : Callback<AssetsList?> {
-            override fun onResponse(call: Call<AssetsList?>, response: Response<AssetsList?>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    _responseAssetList.value = response.body()
+        CoroutineScope(IO).launch {
+            val assetCall: Call<AssetsList?> = coinCapInstance.getAssetList()
+            assetCall.enqueue(object : Callback<AssetsList?> {
+                override fun onResponse(call: Call<AssetsList?>, response: Response<AssetsList?>) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        _responseAssetList.value = response.body()
+                    }
                 }
-            }
-            override fun onFailure(call: Call<AssetsList?>, t: Throwable) {
-            }
-        })
+                override fun onFailure(call: Call<AssetsList?>, t: Throwable) {
+                }
+            })
+        }
     }
 
     companion object {

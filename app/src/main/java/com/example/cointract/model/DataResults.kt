@@ -118,5 +118,5 @@ data class NewsList(
     @SerializedName("source")
     val news_source: String,
 
-)
+    )
 
