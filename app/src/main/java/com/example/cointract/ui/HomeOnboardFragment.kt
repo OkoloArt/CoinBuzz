@@ -7,13 +7,17 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.adapter.OnBoardPagerAdapter
 import com.example.cointract.databinding.FragmentHomeOnboardBinding
+import com.example.cointract.datastore.SettingsManager
 import com.google.android.material.tabs.TabLayoutMediator
 import com.zhpan.indicator.enums.IndicatorSlideMode
 import com.zhpan.indicator.enums.IndicatorStyle
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import kotlin.system.exitProcess
 
 /**
@@ -27,6 +31,7 @@ class HomeOnboardFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var pagerAdapter: OnBoardPagerAdapter
+    private val settingsManager by inject<SettingsManager>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +57,9 @@ class HomeOnboardFragment : Fragment() {
         }
         binding.viewPager.offscreenPageLimit = 1
         binding.btnGotToNextScreen.setOnClickListener {
+            lifecycleScope.launch{
+                settingsManager.storeUserIsFirstTimeLaunch(false,requireContext())
+            }
             val action = HomeOnboardFragmentDirections.actionHomeOnboardFragmentToNavHome()
             findNavController().navigate(action)
         }
@@ -68,5 +76,12 @@ class HomeOnboardFragment : Fragment() {
                     exitProcess(0)
                 }
             })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lifecycleScope.launch{
+            settingsManager.storeUserIsFirstTimeLaunch(false,requireContext())
+        }
     }
 }

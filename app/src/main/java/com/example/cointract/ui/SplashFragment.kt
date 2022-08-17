@@ -18,10 +18,12 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSplashBinding
 import com.example.cointract.datastore.SettingsManager
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
 
@@ -38,6 +40,7 @@ class SplashFragment : Fragment() {
     private val settingsManager by inject<SettingsManager>()
     private var dayNightMode = false
     private var biometricMode = false
+    private var isFirstTime = true
 
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
@@ -70,10 +73,8 @@ class SplashFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun goToNextScreen() {
-//        setDayNightTheme()
-//        showBiometricPrompt()
-        val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
-        findNavController().navigate(action)
+        setDayNightTheme()
+        showBiometricPrompt()
     }
 
     private fun setDayNightTheme(){
@@ -85,15 +86,26 @@ class SplashFragment : Fragment() {
     }
 
     private fun showBiometricPrompt(){
-        if (biometricMode && isBiometricFeatureAvailable()) {
+        if (biometricMode && isBiometricFeatureAvailable() && !isFirstTime) {
             // Prompt appears when user chooses Biometric mode .
             // Consider integrating with the keystore to unlock cryptographic operations,
             // if needed by your app.
             biometricPrompt.authenticate(promptInfo)
-        }else{
+        }else if (isFirstTime){
+            val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
+            findNavController().navigate(action)
+        }
+        else{
             findNavController().navigate(R.id.action_splashFragment_to_nav_home)
         }
     }
+
+//    private fun showOnBoardScreen(){
+//        if (isFirstTime) {
+//            val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
+//            findNavController().navigate(action)
+//        }
+//    }
 
     private fun updateSettingsData() {
 
@@ -102,6 +114,9 @@ class SplashFragment : Fragment() {
         }
         settingsManager.preferenceBiometricFlow.asLiveData().observe(viewLifecycleOwner) {
             biometricMode = it
+        }
+        settingsManager.preferenceIsFirstTimeLaunch.asLiveData().observe(viewLifecycleOwner) {
+            isFirstTime = it
         }
     }
 
@@ -168,6 +183,14 @@ class SplashFragment : Fragment() {
         val biometricManager = BiometricManager.from(requireContext())
         return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
     }
+
+    override fun onStop() {
+        super.onStop()
+        lifecycleScope.launch{
+            settingsManager.storeUserIsFirstTimeLaunch(false,requireContext())
+        }
+    }
+
     companion object {
         private const val REQUEST_CODE = 100
     }

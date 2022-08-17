@@ -1,13 +1,19 @@
 package com.example.cointract
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RectShape
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.view.Menu
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -48,6 +54,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileImage: ImageView
     private lateinit var displayName: TextView
 
+    private var dayNightMode = false
+
     private val settingsManager by inject<SettingsManager>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 //        navView.setupWithNavController(navController)
         navigationSelectedListener(navView, navController, drawerLayout)
 
-        destinationChangeListener(navController)
+        destinationChangeListener(navController, drawerLayout)
 
         bottomNavigationView(navController)
 
@@ -88,7 +96,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun destinationChangeListener(navController: NavController) {
+    private fun destinationChangeListener(
+        navController: NavController,
+        drawerLayout: DrawerLayout,
+    ) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.nav_home -> {
@@ -107,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 else -> {
                     supportActionBar?.hide()
                     binding.appBarMain.bottomNavigation.visibility = View.GONE
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                 }
             }
         }
@@ -128,12 +140,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigationSelectedListener(navView: NavigationView,navController: NavController,drawerLayout: DrawerLayout){
+    private fun navigationSelectedListener(
+        navView: NavigationView,
+        navController: NavController,
+        drawerLayout: DrawerLayout,
+    ) {
         navView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
             if (menuItem.itemId == R.id.nav_settings) {
                 val action = HomeFragmentDirections.actionNavHomeToNavSettings()
-                navController.navigate(action)
+                navController.safeNavigate(action)
+
             }
             drawerLayout.close()
             true
@@ -141,18 +158,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateData() {
+
+        settingsManager.preferenceDayNightFlow.asLiveData().observe(this) {
+            dayNightMode = it
+        }
         settingsManager.preferenceProfileImageFlow.asLiveData().observe(this) {
             if (it.equals("")) {
-                profileImage.setImageResource(R.drawable.ic_indicator_person)
+                when (this.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+                    Configuration.UI_MODE_NIGHT_YES -> {
+                        profileImage.setImageResource(R.drawable.ic_indicator_person)
+                        profileImage.background = imageViewBorder(
+                            borderColor = Color.parseColor(R.color.md_white_1000.toString()),
+                            borderWidthInDp = 2
+                        )
+                    }
+                    Configuration.UI_MODE_NIGHT_NO -> {
+                        profileImage.setImageResource(R.drawable.ic_person)
+                    }
+                }
             } else {
+
                 profileImage.setImageURI(Uri.parse(it))
             }
         }
-
         settingsManager.preferenceDisplayNameFlow.asLiveData().observe(this) {
             displayName.text = it
         }
-
     }
 
     private fun NavController.safeNavigate(direction: NavDirections) {
@@ -230,4 +261,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // extension function to make a border for image view
+    fun Context.imageViewBorder(
+        borderColor: Int = Color.BLACK,
+        borderWidthInDp: Int = 5,
+    ): ShapeDrawable {
+        // convert dp to equivalent pixels value for border
+        val borderWidthInPixels = borderWidthInDp.dpToPixels(this)
+
+        val shapeDrawable = ShapeDrawable(RectShape())
+
+        // specify the border properties
+        shapeDrawable.paint.apply {
+            color = borderColor
+            style = Paint.Style.STROKE
+            strokeWidth = borderWidthInPixels
+            isAntiAlias = true
+            flags = Paint.ANTI_ALIAS_FLAG
+        }
+
+        // set padding for drawable
+        val padding = (borderWidthInPixels * 2).toInt()
+        shapeDrawable.setPadding(padding, padding, padding, padding)
+
+        // return image view border as shape drawable
+        return shapeDrawable
+    }
+
+
+    // extension function to convert dp to equivalent pixels
+    private fun Int.dpToPixels(context: Context): Float = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
+    )
 }

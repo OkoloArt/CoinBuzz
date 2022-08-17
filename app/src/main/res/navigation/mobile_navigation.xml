@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_splashFragment_to_nav_home"
             app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_splashFragment_to_homeOnboardFragment"
+            app:destination="@id/homeOnboardFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_settings"
@@ -62,5 +65,13 @@
         <action
             android:id="@+id/action_newsFragment_self"
             app:destination="@id/newsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeOnboardFragment"
+        android:name="com.example.cointract.ui.HomeOnboardFragment"
+        android:label="HomeOnboardFragment" >
+        <action
+            android:id="@+id/action_homeOnboardFragment_to_nav_home"
+            app:destination="@id/nav_home" />
     </fragment>
 </navigation>
