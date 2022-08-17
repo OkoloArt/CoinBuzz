@@ -79,10 +79,22 @@ class SettingsManager(context: Context) {
             preferences[DISPLAY_NAME] ?: "Hi, User"
         }
 
+    suspend fun storeUserIsFirstTimeLaunch(isFirstTime: Boolean, context: Context) {
+        context.dataStore.edit {
+            it[IS_FIRST_TIME] = isFirstTime
+        }
+    }
+
+    val preferenceIsFirstTimeLaunch: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[IS_FIRST_TIME] ?: true
+        }
+
     companion object {
         private val LAUNCH_SCREEN = stringPreferencesKey("launch_screen")
         private val DAY_NIGHT_MODE = booleanPreferencesKey("day_night_mode")
         private val BIOMETRIC_SETTING = booleanPreferencesKey("biometric")
+        private val IS_FIRST_TIME = booleanPreferencesKey("biometric")
         private val PROFILE_IMAGE = stringPreferencesKey("profile_image")
         private val DISPLAY_NAME = stringPreferencesKey("display_name")
     }

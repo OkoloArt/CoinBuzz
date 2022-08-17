@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -17,14 +16,14 @@ import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSettingsBinding
 import com.example.cointract.datastore.SettingsManager
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
+import org.koin.android.ext.android.inject
 
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var settingsManager: SettingsManager
+    private val settingsManager by inject<SettingsManager>()
 
     private var dayNightMode = false
     private var launchScreen = ""
@@ -41,7 +40,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        settingsManager = SettingsManager(requireContext())
         binding.apply {
             settingsFragment = this@SettingsFragment
         }
@@ -66,7 +64,6 @@ class SettingsFragment : Fragment() {
                 launchScreen = item.title.toString()
                 settingsManager.storeUserLaunchScreen(launchScreen, requireContext())
                 binding.launch.text = launchScreen
-
             }
             true
         }
@@ -76,7 +73,7 @@ class SettingsFragment : Fragment() {
     fun setDayNightMode() {
         dayNightMode = !dayNightMode
         if (dayNightMode) {
-           binding.modeImage.setImageResource(R.drawable.ic_dark_mode)
+            binding.modeImage.setImageResource(R.drawable.ic_dark_mode)
             lifecycleScope.launch {
                 settingsManager.storeUserDayNightTheme(dayNightMode, requireContext())
             }
@@ -110,7 +107,7 @@ class SettingsFragment : Fragment() {
         // Updates Launch Screen selection
         // every time user changes it, it will be observed by preferenceLaunchScreenFlow
         settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
-            launchScreen=it
+            launchScreen = it
             binding.launch.text = launchScreen
         }
 
@@ -118,9 +115,9 @@ class SettingsFragment : Fragment() {
         // every time user changes it, it will be observed by preferenceDayNightFlow
         settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
             dayNightMode = it
-            if (dayNightMode){
+            if (dayNightMode) {
                 binding.modeImage.setImageResource(R.drawable.ic_dark_mode)
-            }else{
+            } else {
                 binding.modeImage.setImageResource(R.drawable.ic_light_mode)
             }
         }
@@ -133,14 +130,20 @@ class SettingsFragment : Fragment() {
 
     }
 
-    private fun handleLaunchScreenAction(){
+    private fun handleLaunchScreenAction() {
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    when(launchScreen){
-                        "Markets" ->{findNavController().navigate(R.id.action_nav_settings_to_nav_home)}
-                        "News" ->{findNavController().navigate(R.id.action_nav_settings_to_newsFragment2)}
+                    when (launchScreen) {
+                        "Markets" -> {
+                            val action = SettingsFragmentDirections.actionNavSettingsToNavHome()
+                            findNavController().navigate(action)
+                        }
+                        "News" -> {
+                            val action =SettingsFragmentDirections.actionNavSettingsToNewsFragment2()
+                            findNavController().navigate(action)
+                        }
                     }
                 }
             })
