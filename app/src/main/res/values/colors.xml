@@ -14,7 +14,10 @@
     <!--grey-->
     <color name="md_grey_100">#F5F5F5</color>
     <color name="md_grey_600">#757575</color>
+    <color name="dark_grey">#808080</color>
+    <color name="platinum_grey">#848884</color>
     <color name="md_black_1000">#000000</color>
+    <color name="md_black">#181818</color>
     <color name="md_white_1000">#ffffff</color>
 
     <!--blue-->
