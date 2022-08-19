@@ -3,13 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/dp_10"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.NewsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:focusableInTouchMode="true"
+        android:focusable="true"
         android:visibility="invisible"
         android:id="@+id/news_list_recyclerview"
         android:layout_width="match_parent"
+        android:paddingBottom="?actionBarSize"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:scrollbars="none" />

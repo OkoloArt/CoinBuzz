@@ -29,7 +29,7 @@ class AssetListAdapter( private val onItemClicked: (AssetList) -> Unit ) :
             setChange24HrImage(binding.assetIndicator, assetList.assetChange24Hr)
             binding.assetName.text = assetList.assetName
             binding.assetPriceUsd.text = "$symbol${roundOffPriceUsd(assetList.assetPriceUsd)}"
-            binding.assetRank.text = assetList.assetRank
+            binding.assetRank.text = "#${assetList.assetRank}"
             binding.assetChange24hr.text =
                 "${roundOffChange24Hr(assetList.assetChange24Hr)}%"
             binding.assetMarketCap.text = "$symbol${roundOffMCap(assetList.assetMCap)}"

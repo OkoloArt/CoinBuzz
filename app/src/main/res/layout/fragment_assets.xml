@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="none"
+    android:padding="5dp"
+    android:overScrollMode="never"
     tools:context=".ui.AssetsFragment">
 
     <RelativeLayout
@@ -21,231 +22,278 @@
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/black_loading" />
 
-    <RelativeLayout
-        android:visibility="invisible"
-        android:id="@+id/main_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/layoutTop"
-            style="@style/layout_background"
+        <RelativeLayout
+            android:id="@+id/main_layout"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:visibility="invisible">
 
-            <TextSwitcher
-                android:id="@+id/textSwitcher"
+            <LinearLayout
+                android:id="@+id/layoutTop"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp">
-            </TextSwitcher>
+                android:layout_height="220dp"
+                android:background="@color/md_black"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/dummy_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:gravity="center_horizontal"
+                    android:padding="@dimen/dp_3"
+                    android:text="@string/bitcoin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dp_20"
+                    android:textStyle="bold"
+                    app:fontFamily="@font/montserrat_medium" />
+
+                <TextSwitcher
+                    android:id="@+id/textSwitcher"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_5">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </TextSwitcher>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/overlapImage"
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                android:layout_above="@id/layoutBottom"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="-60dp"
+                android:adjustViewBounds="true"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="150dp"
+                    android:id="@+id/left_cardView"
+                    android:layout_marginBottom="@dimen/dp_4"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="@dimen/dp_30"
+                    android:elevation="@dimen/dp_10"
+                    app:cardElevation="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="vertical"
+                        android:padding="@dimen/dp_3">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftAssetName"
+                                style="@style/AssetTextStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Bitcoin" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftAssetChange24Hr"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:textColor="@color/md_grey_600"
+                                android:padding="@dimen/dp_3"
+                                android:text="-16.38%"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                                android:textStyle="bold"
+                                app:fontFamily="@font/roboto_condensed_regular" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftAssetSymbol"
+                            style="@style/AssetTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="BTC" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:scaleType="fitXY"
+                            app:srcCompat="@mipmap/dummy" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/leftAssetIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center_vertical"
+                                app:srcCompat="@mipmap/portfolio" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    style="@style/AssetTextStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="USD" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/leftAssetPriceUsd"
+                                    style="@style/AssetTextStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="3889.89" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/right_cardView"
+                    android:layout_width="150dp"
+                    android:layout_marginBottom="@dimen/dp_4"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/dp_30"
+                    app:cardElevation="10dp">
+
+                    <LinearLayout
+                        android:padding="@dimen/dp_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/rightAssetName"
+                                style="@style/AssetTextStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Bitcoin" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/rightAssetChange24Hr"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/dp_3"
+                                android:textColor="@color/md_grey_600"
+                                android:text="-16.38%"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                                android:textStyle="bold"
+                                app:fontFamily="@font/roboto_condensed_regular" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/rightAssetSymbol"
+                            style="@style/AssetTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="BTC" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:scaleType="fitXY"
+                            app:srcCompat="@mipmap/dummy" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/rightAssetIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center_vertical"
+                                app:srcCompat="@mipmap/portfolio" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    style="@style/AssetTextStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="USD" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/rightAssetPriceUsd"
+                                    style="@style/AssetTextStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="3889.89" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutBottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/layoutTop"
+                android:layout_marginTop="-2dp"
+                android:orientation="horizontal" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dummy_text"
+                android:id="@+id/title_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="Bitcoin"
-                android:textColor="@color/white" />
+                android:layout_below="@id/overlapImage"
+                android:layout_marginTop="65dp"
+                android:text="Assets"
+                android:layout_marginStart="@dimen/dp_15"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:fontFamily="@font/oswald_regular" />
 
-
-        </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/overlapImage"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_above="@id/layoutBottom"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-50dp"
-        android:adjustViewBounds="true"
-        android:orientation="horizontal">
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            app:cardElevation="10dp">
-
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/assets_list_recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginStart="@dimen/dp_15"
+                android:paddingBottom="?actionBarSize"
+                android:layout_height="match_parent"
+                android:layout_below="@id/title_text"
+                android:layout_marginTop="5dp"
+                android:nestedScrollingEnabled="false"
+                android:scrollbars="none" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftAssetName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Bitcoin" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftAssetChange24Hr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:text="-16.38%" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/leftAssetSymbol"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="BTC" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:scaleType="fitXY"
-                    app:srcCompat="@mipmap/crypto" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/leftAssetIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:srcCompat="@mipmap/portfolio" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="USD" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/leftAssetPriceUsd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3889.89" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            app:cardElevation="10dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/rightAssetName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Bitcoin" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/rightAssetChange24Hr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-16.38%" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/rightAssetSymbol"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="BTC" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:scaleType="fitXY"
-                    app:srcCompat="@mipmap/crypto" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/rightAssetIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:srcCompat="@mipmap/portfolio" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="USD" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rightAssetPriceUsd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3889.89" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutBottom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/layoutTop"
-        android:layout_marginTop="-2dp"
-        android:orientation="horizontal" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/title_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/overlapImage"
-        android:layout_marginTop="60dp"
-        android:text="Assets"
-        android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/assets_list_recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/title_text"
-            android:nestedScrollingEnabled="false"
-            android:layout_marginTop="10dp"
-            android:scrollbars="none" />
-
-    </RelativeLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </ScrollView>

@@ -26,7 +26,7 @@ class MarketAdapter : ListAdapter<MarketList, MarketAdapter.MarketListViewHolder
             binding.marketVolume.text = "vol $symbol${roundOffVUsd(marketList.volume)}\n"
             binding.marketExchange.text = marketList.exchange
             binding.marketPrice.text =
-                "$symbol${roundOffPriceUsd(marketList.price)}%"
+                "$symbol${roundOffPriceUsd(marketList.price)}"
         }
 
         private fun roundOffPriceUsd(num: String): String {

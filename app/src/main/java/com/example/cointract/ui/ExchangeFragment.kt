@@ -48,16 +48,18 @@ class ExchangeFragment : Fragment() {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                Handler(Looper.getMainLooper()).post {
+                Handler(Looper.getMainLooper()).postDelayed({
                     retrieveExchangeListJson()
-                }
+                }, 6000)
             }
         }
     }
 
     private fun retrieveExchangeListJson() {
-        coinViewModel.responseExchange.observe(viewLifecycleOwner){ exchanges ->
+        coinViewModel.responseExchange.observe(viewLifecycleOwner) { exchanges ->
             exchanges?.let {
+                binding.loading.visibility = View.INVISIBLE
+                binding.exchangeListRecyclerview.visibility = View.VISIBLE
                 exchangeResultList = exchanges.data as MutableList<ExchangeList>
                 adapter = ExchangeListAdapter()
                 adapter.submitList(exchangeResultList)

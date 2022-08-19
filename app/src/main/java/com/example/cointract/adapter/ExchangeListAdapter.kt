@@ -27,7 +27,7 @@ class ExchangeListAdapter :
         fun bind(exchangeList: ExchangeList) {
             setChange24HrImage(binding.exchangeIndicator, exchangeList.exchangePercentVolume)
             binding.exchangeName.text = exchangeList.exchangeName
-            binding.exchangePriceUsd.text = "$symbol${roundOffVUsd(exchangeList.exchangeVolumeUsd)}\nV(Usd)"
+            binding.exchangePriceUsd.text = "$symbol${roundOffVUsd(exchangeList.exchangeVolumeUsd)}"
             binding.exchangeRank.text = exchangeList.exchangeRank
             binding.exchangeVolume.text =
                 "${roundOffChange24Hr(exchangeList.exchangePercentVolume)}%"
@@ -62,7 +62,7 @@ class ExchangeListAdapter :
             when (pattern.format(number).toDouble()) {
                 in 1000001.0..999999999.0 -> {
                     val newNumber = number / 1000000
-                    return "${pattern.format(newNumber)}Mn"
+                    return "${pattern.format(newNumber)}M"
                 }
             }
             val newNumber = number / 1000000000

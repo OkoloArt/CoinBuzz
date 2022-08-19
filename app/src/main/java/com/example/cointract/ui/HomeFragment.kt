@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
@@ -34,6 +35,9 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val settingsManager by inject<SettingsManager>()
+    private var dayNightMode = false
 
     private lateinit var pagerAdapter: HomePagerAdapter
     private val connectivityObserver by inject<NetworkConnectivityObserver>()
@@ -78,7 +82,6 @@ class HomeFragment : Fragment() {
             viewPager.isUserInputEnabled = false
             //tabs.setSelectedTabIndicator(null)
         }
-
 
         TabLayoutMediator(binding.tabs, binding.viewPager) { tab, position ->
             tab.text = categoryArray[position]

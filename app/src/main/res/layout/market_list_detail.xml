@@ -2,9 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_marginStart="@dimen/dp_5"
+    android:layout_marginEnd="@dimen/dp_10"
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/market_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -18,12 +21,16 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/market_pair"
                 android:layout_width="0dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                app:fontFamily="@font/roboto_condensed_regular"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="ETH/USDT" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/market_price"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                app:fontFamily="@font/roboto_condensed_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -38,17 +45,31 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/market_exchange"
+                android:padding="@dimen/dp_2"
                 android:layout_weight="1"
                 android:layout_width="0dp"
+                android:textColor="@color/md_grey_600"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                app:fontFamily="@font/oswald_regular"
                 android:layout_height="wrap_content"
                 android:text="Binance" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:padding="@dimen/dp_2"
+                android:textColor="@color/md_grey_600"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                app:fontFamily="@font/oswald_regular"
                 android:id="@+id/market_volume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="vol $20,000" />
 
         </LinearLayout>
+        <View
+            android:id="@+id/view"
+            style="@style/Divider"
+            android:alpha="0.2"
+            android:background="@color/platinum_grey" />
     </LinearLayout>
+
 </RelativeLayout>

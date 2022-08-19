@@ -15,7 +15,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-class NewsAdapter: ListAdapter<NewsList, NewsAdapter.NewsListViewHolder>(DiffCallback) {
+class NewsAdapter(private val onItemClicked : (NewsList) -> Unit): ListAdapter<NewsList, NewsAdapter.NewsListViewHolder>(DiffCallback) {
 
     class NewsListViewHolder(private val binding: NewsListDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -40,6 +40,9 @@ class NewsAdapter: ListAdapter<NewsList, NewsAdapter.NewsListViewHolder>(DiffCal
 
     override fun onBindViewHolder(holder: NewsListViewHolder, position: Int) {
         val current = getItem(position)
+        holder.itemView.setOnClickListener {
+            onItemClicked(current)
+        }
         holder.bind(current)
     }
 

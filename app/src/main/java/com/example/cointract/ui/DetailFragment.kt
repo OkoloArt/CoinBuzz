@@ -2,22 +2,25 @@ package com.example.cointract.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cointract.R
 import com.example.cointract.adapter.MarketAdapter
 import com.example.cointract.databinding.FragmentDetailBinding
 import com.example.cointract.model.*
@@ -65,6 +68,9 @@ class DetailFragment : Fragment() {
     private var marketListResult = mutableListOf<MarketList>(
     )
 
+    private var coinListResult = mutableListOf<CoinStatList>(
+    )
+
     private lateinit var adapter: MarketAdapter
     private var coinId = ""
     private val connectivityObserver by inject<NetworkConnectivityObserver>()
@@ -88,6 +94,9 @@ class DetailFragment : Fragment() {
         binding.apply {
             detailFragment = this@DetailFragment
             detailViewModel = coinViewModel
+            explore.setOnClickListener{
+               learnMore()
+            }
         }
 
     }
@@ -117,6 +126,7 @@ class DetailFragment : Fragment() {
                                             retrieveCandleListJson(
                                                 FOUR_HOUR,
                                                 coinId)
+                                            retrieveCoinListJson()
                                         }
                                     }
                                 }, 6000)
@@ -130,10 +140,11 @@ class DetailFragment : Fragment() {
     }
 
     fun showMarkets() {
-
+        binding.markets.background = resources.getDrawable(R.drawable.button_background)
+        binding.overview.background = null
+        binding.overviewDisplay.visibility = View.INVISIBLE
         if (checkForInternet(requireContext())) {
             binding.loading.visibility = View.VISIBLE
-            binding.overviewDisplay.visibility = View.INVISIBLE
             binding.noInternetConnection.visibility = View.INVISIBLE
             Handler(Looper.getMainLooper()).postDelayed({
                 retrieveMarketListJson(coinId)
@@ -147,22 +158,49 @@ class DetailFragment : Fragment() {
     }
 
     fun showOverview() {
-
+        binding.overview.background = resources.getDrawable(R.drawable.button_background)
+        binding.markets.background = null
+        binding.marketsRecyclerview.visibility = View.INVISIBLE
+        candleStickChart.notifyDataSetChanged()
+        candleStickChart.invalidate()
         if (checkForInternet(requireContext())) {
             binding.loading.visibility = View.VISIBLE
             binding.noInternetConnection.visibility = View.INVISIBLE
-            binding.marketsRecyclerview.visibility = View.INVISIBLE
             Handler(Looper.getMainLooper()).postDelayed({
                 retrieveAssetSingleJson(coinId)
                 retrieveCandleListJson(FOUR_HOUR, coinId)
             }, 6000)
-
         } else {
-            binding.loading.visibility = View.INVISIBLE
+            binding.loading.visibility = View.VISIBLE
             binding.overviewDisplay.visibility = View.INVISIBLE
             binding.marketsRecyclerview.visibility = View.INVISIBLE
             binding.noInternetConnection.visibility = View.VISIBLE
         }
+    }
+
+    private fun retrieveCoinListJson() {
+        coinViewModel.responseCoinList.observe(viewLifecycleOwner) { coins ->
+            coins?.let {
+                coinListResult.clear()
+                coinListResult = coins.coins as MutableList<CoinStatList>
+            }
+        }
+    }
+
+     private fun learnMore() {
+        var webUrl = ""
+        for (i in coinListResult.indices) {
+            if (coinListResult[i].asset_id == coinId) {
+                webUrl = coinListResult[i].asset_Url
+                openWebPage(webUrl)
+            }
+        }
+    }
+
+    private fun openWebPage(url: String) {
+        val openURL = Intent(Intent.ACTION_VIEW)
+        openURL.data = Uri.parse(url)
+        startActivity(openURL)
     }
 
     private fun retrieveAssetSingleJson(assetId: String) {
@@ -175,6 +213,7 @@ class DetailFragment : Fragment() {
                     binding.apply {
                         loading.visibility = View.INVISIBLE
                         overviewDisplay.visibility = View.VISIBLE
+                        binding.marketsRecyclerview.visibility = View.INVISIBLE
                         assetName.text = response.body()!!.data.assetName
                         assetPriceUsd.text =
                             roundOffPriceUsd(response.body()!!.data.assetPriceUsd)
@@ -196,12 +235,13 @@ class DetailFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<AssetSingle?>, t: Throwable) {
-                TODO("Not yet implemented")
+                Toast.makeText(requireContext(), "Error: $t", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    private fun retrieveCandleListJson(interval: String, baseId: String
+    private fun retrieveCandleListJson(
+        interval: String, baseId: String,
     ) {
         val assetCall: Call<Candles?> =
             coinCapInstance.getCandleList(EXCHANGE, interval, baseId, QUOTE_ID)
@@ -209,8 +249,13 @@ class DetailFragment : Fragment() {
             override fun onResponse(call: Call<Candles?>, response: Response<Candles?>) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     candleListResult.clear()
+                    if (response.body()!!.data.isEmpty()){
+                        binding.noChartData.visibility=View.VISIBLE
+                        return
+                    }else{
+                        binding.noChartData.visibility=View.INVISIBLE
                     candleListResult =
-                        response.body()!!.data.takeLast(20) as MutableList<CandlesData>
+                        response.body()!!.data.takeLast(20) as MutableList<CandlesData>}
 
                     for (i in candleListResult.indices) {
                         entriesData.add(CandleEntry(
@@ -228,7 +273,7 @@ class DetailFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<Candles?>, t: Throwable) {
-                TODO("Not yet implemented")
+                Toast.makeText(requireContext(), "Error: $t", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -243,6 +288,7 @@ class DetailFragment : Fragment() {
                 if (response.isSuccessful && response.body() != null) {
                     binding.loading.visibility = View.INVISIBLE
                     binding.marketsRecyclerview.visibility = View.VISIBLE
+                    binding.overviewDisplay.visibility = View.INVISIBLE
                     marketListResult.clear()
                     marketListResult = response.body()!! as MutableList<MarketList>
                     adapter = MarketAdapter()
@@ -254,7 +300,7 @@ class DetailFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<List<MarketList>?>, t: Throwable) {
-                TODO("Not yet implemented")
+                Toast.makeText(requireContext(), "Error: $t", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -304,7 +350,7 @@ class DetailFragment : Fragment() {
 
             val yAxis = candleStickChart.axisLeft
             val rightAxis = candleStickChart.axisRight
-            yAxis.setDrawGridLines(false)
+            yAxis.setDrawGridLines(true)
             rightAxis.setDrawGridLines(false)
 
             val xAxis = candleStickChart.xAxis
@@ -354,22 +400,6 @@ class DetailFragment : Fragment() {
         candleStickChart.invalidate()
     }
 
-    fun oneHourChart(baseId: String) {
-        retrieveCandleListJson(ONE_HOUR, baseId)
-    }
-
-    fun fourHourChart(baseId: String) {
-        retrieveCandleListJson(FOUR_HOUR, baseId)
-    }
-
-    fun eightHourChart(baseId: String) {
-        retrieveCandleListJson(EIGHT_HOUR, baseId)
-    }
-
-    fun oneDayChart(baseId: String) {
-        retrieveCandleListJson(ONE_DAY, baseId)
-    }
-
     private fun checkForInternet(context: Context): Boolean {
 
         // register activity with the connectivity manager service
@@ -380,33 +410,25 @@ class DetailFragment : Fragment() {
         // or greater we need to use the
         // NetworkCapabilities to check what type of
         // network has the internet connection
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            // Returns a Network object corresponding to
-            // the currently active default data network.
-            val network = connectivityManager.activeNetwork ?: return false
+        // Returns a Network object corresponding to
+        // the currently active default data network.
+        val network = connectivityManager.activeNetwork ?: return false
 
-            // Representation of the capabilities of an active network.
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        // Representation of the capabilities of an active network.
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
-            return when {
-                // Indicates this network uses a Wi-Fi transport,
-                // or WiFi has network connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        return when {
+            // Indicates this network uses a Wi-Fi transport,
+            // or WiFi has network connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
 
-                // Indicates this network uses a Cellular transport. or
-                // Cellular has network connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // Indicates this network uses a Cellular transport. or
+            // Cellular has network connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
 
-                // else return false
-                else -> false
-            }
-        } else {
-            // if the android version is below M
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
+            // else return false
+            else -> false
         }
     }
 

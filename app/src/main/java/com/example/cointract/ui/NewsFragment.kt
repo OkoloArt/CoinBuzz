@@ -1,8 +1,10 @@
 package com.example.cointract.ui
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +12,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import kotlin.system.exitProcess
 
 /**
  * A simple [Fragment] subclass.
@@ -80,8 +84,15 @@ class NewsFragment : Fragment() {
                     }
                 }
             }
+
+        handleOnBackPressed()
     }
 
+    private fun openWebPage(url: String) {
+        val openURL = Intent(Intent.ACTION_VIEW)
+        openURL.data = Uri.parse(url)
+        startActivity(openURL)
+    }
     private fun retrieveNewsListJson() {
         if (view != null) {
             coinViewModel.responseNews.observe(viewLifecycleOwner) { news ->
@@ -89,7 +100,9 @@ class NewsFragment : Fragment() {
                     binding.loading.visibility = View.INVISIBLE
                     binding.newsListRecyclerview.visibility = View.VISIBLE
                     newsListResult = news.news as MutableList<NewsList>
-                    adapter = NewsAdapter()
+                    adapter = NewsAdapter{
+                        openWebPage(it.news_link)
+                    }
                     adapter.submitList(newsListResult)
                     binding.newsListRecyclerview.layoutManager = LinearLayoutManager(
                         requireContext(),
@@ -99,6 +112,17 @@ class NewsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun handleOnBackPressed(){
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    activity!!.finish()
+                    exitProcess(0)
+                }
+            })
     }
 
     private fun checkForInternet(context: Context): Boolean {
@@ -111,33 +135,25 @@ class NewsFragment : Fragment() {
         // or greater we need to use the
         // NetworkCapabilities to check what type of
         // network has the internet connection
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            // Returns a Network object corresponding to
-            // the currently active default data network.
-            val network = connectivityManager.activeNetwork ?: return false
+        // Returns a Network object corresponding to
+        // the currently active default data network.
+        val network = connectivityManager.activeNetwork ?: return false
 
-            // Representation of the capabilities of an active network.
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        // Representation of the capabilities of an active network.
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
-            return when {
-                // Indicates this network uses a Wi-Fi transport,
-                // or WiFi has network connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        return when {
+            // Indicates this network uses a Wi-Fi transport,
+            // or WiFi has network connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
 
-                // Indicates this network uses a Cellular transport. or
-                // Cellular has network connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // Indicates this network uses a Cellular transport. or
+            // Cellular has network connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
 
-                // else return false
-                else -> false
-            }
-        } else {
-            // if the android version is below M
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
+            // else return false
+            else -> false
         }
     }
 }
