@@ -22,15 +22,6 @@
             android:clipToPadding="false"
             android:overScrollMode="never" />
 
-
-<!--        <com.google.android.material.tabs.TabLayout-->
-<!--            android:id="@+id/pageIndicator"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_margin="30dp"-->
-<!--            app:tabGravity="center"-->
-<!--            app:tabBackground="@drawable/onboarding_viewpager_selector_white"/>-->
-
         <com.zhpan.indicator.IndicatorView
             android:id="@+id/indicator_view"
             app:vpi_slider_checked_color="@color/md_white_1000"
