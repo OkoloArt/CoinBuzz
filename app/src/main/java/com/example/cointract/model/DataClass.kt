@@ -12,4 +12,6 @@ data class Candles(@SerializedName("data") var data: List<CandlesData>)
 
 data class News(@SerializedName("news") var news: List<NewsList>)
 
+data class Coins(@SerializedName("coins") var coins: List<CoinStatList>)
+
 

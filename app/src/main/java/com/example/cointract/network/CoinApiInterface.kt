@@ -42,4 +42,8 @@ interface CoinApiInterface {
         @Query("limit") limit:String
     ): Call<News?>
 
+    @GET("coins")
+    fun getCoinsList(
+    ): Call<Coins?>
+
 }

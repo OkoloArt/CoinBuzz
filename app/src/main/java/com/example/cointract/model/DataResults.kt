@@ -118,5 +118,18 @@ data class NewsList(
     @SerializedName("source")
     val news_source: String,
 
+    @SerializedName("link")
+    val news_link: String,
+
+    )
+
+data class CoinStatList(
+
+    @SerializedName("id")
+    val asset_id: String,
+
+    @SerializedName("websiteUrl")
+    val asset_Url: String,
+
     )
 

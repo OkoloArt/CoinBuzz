@@ -40,6 +40,9 @@ class CoinViewModel : ViewModel(), KoinComponent {
     private var _responseAssetList = MutableLiveData<AssetsList>()
     val responseAssetList: LiveData<AssetsList> get() = _responseAssetList
 
+    private var _responseCoinList = MutableLiveData<Coins>()
+    val responseCoinList: LiveData<Coins> get() = _responseCoinList
+
     fun setAssetId(id: String) {
         _assetId.value = id
     }
@@ -54,6 +57,7 @@ class CoinViewModel : ViewModel(), KoinComponent {
             }
         }, 0, 10000)
         retrieveNewsListJson()
+        retrieveCoinListJson()
     }
 
     private fun retrieveNewsListJson() {
@@ -67,7 +71,24 @@ class CoinViewModel : ViewModel(), KoinComponent {
                 }
 
                 override fun onFailure(call: Call<News?>, t: Throwable) {
-                    TODO("Not yet implemented")
+//                    TODO("Not yet implemented")
+                }
+            })
+        }
+    }
+
+    private fun retrieveCoinListJson() {
+        CoroutineScope(IO).launch {
+            val assetCall: Call<Coins?> = coinStatsInstance.getCoinsList()
+            assetCall.enqueue(object : Callback<Coins?> {
+                override fun onResponse(call: Call<Coins?>, response: Response<Coins?>) {
+                    if (response.isSuccessful && response.body()?.coins != null) {
+                        _responseCoinList.value = response.body()
+                    }
+                }
+
+                override fun onFailure(call: Call<Coins?>, t: Throwable) {
+
                 }
             })
         }
