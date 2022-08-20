@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSettingsBinding
 import com.example.cointract.datastore.SettingsManager
+import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -27,6 +28,7 @@ class SettingsFragment : Fragment() {
 
     private var dayNightMode = false
     private var launchScreen = ""
+    private var biometric = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,13 +42,13 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        updateData()
         binding.apply {
             settingsFragment = this@SettingsFragment
         }
-
-        handleLaunchScreenAction()
-        updateData()
         setBiometricSettings()
+        handleLaunchScreenAction()
+
     }
 
 
@@ -59,11 +61,10 @@ class SettingsFragment : Fragment() {
         popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
         popupMenu.gravity = Gravity.END
         popupMenu.setOnMenuItemClickListener { item ->
-            Toast.makeText(requireContext(), " Clicked: ${item.title}", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch {
                 launchScreen = item.title.toString()
                 settingsManager.storeUserLaunchScreen(launchScreen, requireContext())
-                binding.launch.text = launchScreen
+                binding.launch.text = "$launchScreen >"
             }
             true
         }
@@ -83,18 +84,17 @@ class SettingsFragment : Fragment() {
                 settingsManager.storeUserDayNightTheme(dayNightMode, requireContext())
             }
         }
-        findNavController().navigate(R.id.action_nav_settings_to_splashFragment)
+        ProcessPhoenix.triggerRebirth(activity?.applicationContext);
+//        findNavController().navigate(R.id.action_nav_settings_to_splashFragment)
     }
 
     private fun setBiometricSettings() {
         binding.biometricSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Toast.makeText(requireContext(), " Clicked: $isChecked", Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
                     settingsManager.storeUserBiometricSettings(isChecked, requireContext())
                 }
             } else {
-                Toast.makeText(requireContext(), " Clicked: $isChecked", Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
                     settingsManager.storeUserBiometricSettings(isChecked, requireContext())
                 }
@@ -108,7 +108,7 @@ class SettingsFragment : Fragment() {
         // every time user changes it, it will be observed by preferenceLaunchScreenFlow
         settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
             launchScreen = it
-            binding.launch.text = launchScreen
+            binding.launch.text = "$launchScreen >"
         }
 
         // Updates DayNight selection
@@ -125,7 +125,8 @@ class SettingsFragment : Fragment() {
         // Updates Biometric selection
         // every time user changes it, it will be observed by preferenceBiometricFlow
         settingsManager.preferenceBiometricFlow.asLiveData().observe(viewLifecycleOwner) {
-            binding.biometricSwitch.isChecked = it
+            biometric = it
+            binding.biometricSwitch.isChecked=biometric
         }
 
     }

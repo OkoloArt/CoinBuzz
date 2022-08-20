@@ -94,7 +94,7 @@ class SettingsManager(context: Context) {
         private val LAUNCH_SCREEN = stringPreferencesKey("launch_screen")
         private val DAY_NIGHT_MODE = booleanPreferencesKey("day_night_mode")
         private val BIOMETRIC_SETTING = booleanPreferencesKey("biometric")
-        private val IS_FIRST_TIME = booleanPreferencesKey("biometric")
+        private val IS_FIRST_TIME = booleanPreferencesKey("isFirstTime")
         private val PROFILE_IMAGE = stringPreferencesKey("profile_image")
         private val DISPLAY_NAME = stringPreferencesKey("display_name")
     }

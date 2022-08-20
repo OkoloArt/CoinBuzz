@@ -10,17 +10,23 @@
     </data>
 
     <RelativeLayout
+        android:padding="@dimen/dp_10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/app_text"
+            android:layout_marginTop="@dimen/dp_10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_setting_text" />
+            android:text="@string/app_setting_text"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            app:fontFamily="@font/oswald_medium" />
 
         <androidx.cardview.widget.CardView
+            app:cardCornerRadius="@dimen/dp_15"
             android:id="@+id/app_setting"
+            android:layout_marginTop="@dimen/dp_10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/app_text">
@@ -38,14 +44,18 @@
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
-
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        app:fontFamily="@font/pt_sans_narrow_regular"
                         android:layout_width="0dp"
+                        android:padding="@dimen/dp_10"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/launch_screen" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/launch"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                        app:fontFamily="@font/roboto_condensed_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="markets >" />
@@ -61,15 +71,20 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/mode_text"
                         android:layout_width="0dp"
+                        android:layout_margin="@dimen/dp_5"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        app:fontFamily="@font/pt_sans_narrow_regular"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:padding="@dimen/dp_10"
                         android:text="@string/switch_mode" />
 
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/mode_image"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="35dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="35dp"
                         app:srcCompat="@drawable/ic_light_mode" />
 
                 </LinearLayout>
@@ -81,9 +96,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/app_setting"
-            android:text="@string/security" />
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="@string/security"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:fontFamily="@font/oswald_medium" />
 
         <androidx.cardview.widget.CardView
+            android:layout_marginTop="@dimen/dp_10"
+            app:cardCornerRadius="@dimen/dp_15"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/security_text">
@@ -95,28 +115,36 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
+                        android:layout_marginTop="@dimen/dp_5"
+                        android:padding="@dimen/dp_10"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        app:fontFamily="@font/pt_sans_narrow_regular"
                         android:text="@string/biometric" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/biometric_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                        app:fontFamily="@font/roboto_condensed_regular"
+                        android:padding="@dimen/dp_5"
                         android:text="Unlock with fingerprint" />
 
                 </LinearLayout>
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/biometric_switch"
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:id="@+id/biometric_switch"
+                    android:layout_gravity="bottom"
+                    android:layout_height="match_parent" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
