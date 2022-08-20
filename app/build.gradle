@@ -14,6 +14,7 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -93,5 +94,5 @@ dependencies {
     //CircleIndicator
     implementation "com.github.zhpanvip:viewpagerindicator:1.2.1"
 
-
+    implementation "com.jakewharton:process-phoenix:2.1.2"
 }

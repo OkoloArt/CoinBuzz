@@ -4,6 +4,7 @@
     package="com.example.cointract">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.apps.photos.permission.GOOGLE_PHOTOS"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
@@ -23,8 +24,9 @@
             android:exported="true"
             android:theme="@style/Theme.CoinTract.NoActionBar">
             <intent-filter>
+                <action android:name="android.intent.action.OPEN_DOCUMENT"/>
                 <action android:name="android.intent.action.MAIN" />
-
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
