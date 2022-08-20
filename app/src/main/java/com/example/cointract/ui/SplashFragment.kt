@@ -1,5 +1,6 @@
 package com.example.cointract.ui
 
+import android.animation.Animator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.cointract.R
 import com.example.cointract.databinding.FragmentSplashBinding
 import com.example.cointract.datastore.SettingsManager
 import kotlinx.coroutines.launch
@@ -40,7 +40,8 @@ class SplashFragment : Fragment() {
     private val settingsManager by inject<SettingsManager>()
     private var dayNightMode = false
     private var biometricMode = false
-    private var isFirstTime = true
+    private var isFirstTime = false
+    private var launchScreen = ""
 
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
@@ -66,18 +67,29 @@ class SplashFragment : Fragment() {
         biometricAuthentication()
         checkBiometricCapability()
         updateSettingsData()
-        binding.nextScreen.setOnClickListener {
-            goToNextScreen()
-        }
+        binding.splashImage.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator?) {
+            }
+
+            override fun onAnimationEnd(p0: Animator?) {
+                goToNextScreen()
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator?) {
+            }
+
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun goToNextScreen() {
-        setDayNightTheme()
-        showBiometricPrompt()
+        showOnBoardScreen()
     }
 
-    private fun setDayNightTheme(){
+    private fun setDayNightTheme() {
         if (dayNightMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
@@ -85,29 +97,47 @@ class SplashFragment : Fragment() {
         }
     }
 
-    private fun showBiometricPrompt(){
-        if (biometricMode && isBiometricFeatureAvailable() && !isFirstTime) {
+    private fun launchScreen(){
+        when (launchScreen) {
+            "Markets" -> {
+                val action = SplashFragmentDirections.actionSplashFragmentToNavHome()
+                findNavController().navigate(action)
+            }
+            "News" -> {
+                val action =SplashFragmentDirections.actionSplashFragmentToNewsFragment()
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    private fun showBiometricPrompt() {
+        if (biometricMode && isBiometricFeatureAvailable()) {
             // Prompt appears when user chooses Biometric mode .
             // Consider integrating with the keystore to unlock cryptographic operations,
             // if needed by your app.
             biometricPrompt.authenticate(promptInfo)
-        }else if (isFirstTime){
-            val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
-            findNavController().navigate(action)
-        }
-        else{
-            findNavController().navigate(R.id.action_splashFragment_to_nav_home)
+        } else {
+            setDayNightTheme()
+            launchScreen()
+//            val action = SplashFragmentDirections.actionSplashFragmentToNavHome()
+//            findNavController().navigate(action)
         }
     }
 
-//    private fun showOnBoardScreen(){
-//        if (isFirstTime) {
-//            val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
-//            findNavController().navigate(action)
-//        }
-//    }
+    private fun showOnBoardScreen() {
+        if (isFirstTime) {
+            val action = SplashFragmentDirections.actionSplashFragmentToHomeOnboardFragment()
+            findNavController().navigate(action)
+        } else {
+            showBiometricPrompt()
+        }
+    }
 
     private fun updateSettingsData() {
+
+        settingsManager.preferenceLaunchScreenFlow.asLiveData().observe(viewLifecycleOwner) {
+            launchScreen = it
+        }
 
         settingsManager.preferenceDayNightFlow.asLiveData().observe(viewLifecycleOwner) {
             dayNightMode = it
@@ -121,12 +151,12 @@ class SplashFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun checkBiometricCapability(){
+    private fun checkBiometricCapability() {
         val biometricManager = BiometricManager.from(requireContext())
         when (biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)) {
-            BiometricManager.BIOMETRIC_SUCCESS ->{
+            BiometricManager.BIOMETRIC_SUCCESS -> {
                 Log.d("MY_APP_TAG", "App can authenticate using biometrics.")
-                }
+            }
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
                 Log.e("MY_APP_TAG", "No biometric features available on this device.")
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
@@ -144,12 +174,14 @@ class SplashFragment : Fragment() {
         }
     }
 
-    private fun biometricAuthentication(){
+    private fun biometricAuthentication() {
         executor = ContextCompat.getMainExecutor(requireContext())
         biometricPrompt = BiometricPrompt(this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int,
-                                                   errString: CharSequence) {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence,
+                ) {
                     super.onAuthenticationError(errorCode, errString)
                     Toast.makeText(requireContext(),
                         "Authentication error: $errString", Toast.LENGTH_SHORT)
@@ -157,10 +189,13 @@ class SplashFragment : Fragment() {
                 }
 
                 override fun onAuthenticationSucceeded(
-                    result: BiometricPrompt.AuthenticationResult) {
+                    result: BiometricPrompt.AuthenticationResult,
+                ) {
                     super.onAuthenticationSucceeded(result)
-                    val action = SplashFragmentDirections.actionSplashFragmentToNavHome()
-                    findNavController().navigate(action)
+                    setDayNightTheme()
+                    launchScreen()
+//                    val action = SplashFragmentDirections.actionSplashFragmentToNavHome()
+//                    findNavController().navigate(action)
                 }
 
                 override fun onAuthenticationFailed() {
@@ -172,22 +207,22 @@ class SplashFragment : Fragment() {
             })
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
+            .setTitle("Biometric login")
             .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Use account password")
+            .setNegativeButtonText("Cancel")
             .build()
 
     }
 
-    private fun isBiometricFeatureAvailable() : Boolean{
+    private fun isBiometricFeatureAvailable(): Boolean {
         val biometricManager = BiometricManager.from(requireContext())
         return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
     }
 
     override fun onStop() {
         super.onStop()
-        lifecycleScope.launch{
-            settingsManager.storeUserIsFirstTimeLaunch(false,requireContext())
+        lifecycleScope.launch {
+            settingsManager.storeUserIsFirstTimeLaunch(false, requireContext())
         }
     }
 

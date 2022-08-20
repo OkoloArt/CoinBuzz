@@ -11,30 +11,36 @@
     </data>
 
     <RelativeLayout
+        android:background="@color/md_black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.SplashFragment">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_marginTop="@dimen/dp_120"
             android:id="@+id/splash_image"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
             android:scaleType="fitXY"
-            app:srcCompat="@mipmap/crypto" />
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false"
+            app:lottie_repeatCount="3"
+            app:lottie_rawRes="@raw/splash_bitcoin_loader" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
-            android:id="@+id/splash_intro_text"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splash_image"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/dp_30"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
             android:text="@string/intro_text"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/splash_image" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/white"
+            app:fontFamily="@font/roboto_condensed_regular" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/splash_intro_text"
-            android:id="@+id/next_screen"
-            android:text="Get Started" />
 
     </RelativeLayout>
 </layout>

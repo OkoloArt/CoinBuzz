@@ -1,19 +1,15 @@
 package com.example.cointract
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -54,8 +50,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileImage: ImageView
     private lateinit var displayName: TextView
 
-    private var dayNightMode = false
-
     private val settingsManager by inject<SettingsManager>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home), drawerLayout)
+            R.id.nav_home, R.id.newsFragment), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
 //        navView.setupWithNavController(navController)
         navigationSelectedListener(navView, navController, drawerLayout)
@@ -91,7 +85,6 @@ class MainActivity : AppCompatActivity() {
         displayName.setOnClickListener {
             showDialog()
         }
-
         updateData()
 
     }
@@ -106,14 +99,18 @@ class MainActivity : AppCompatActivity() {
                     Handler(Looper.getMainLooper()).postDelayed({
                         //doSomethingHere()
                         supportActionBar?.show()
-                        binding.appBarMain.bottomNavigation.visibility = View.VISIBLE
-                        binding.appBarMain.bottomNavigation.selectedItemId
+                        binding.appBarMain.bottomNavigation.apply {
+                            visibility = View.VISIBLE
+                            selectedItemId = R.id.home
+                        }
                         supportActionBar?.title = null
                     }, 0)
                 }
                 R.id.newsFragment -> {
+                    supportActionBar?.show()
                     binding.appBarMain.bottomNavigation.visibility = View.VISIBLE
-                    binding.appBarMain.bottomNavigation.selectedItemId
+                    binding.appBarMain.bottomNavigation.selectedItemId = R.id.news
+                    supportActionBar?.title = getString(R.string.news)
                 }
                 else -> {
                     supportActionBar?.hide()
@@ -148,9 +145,18 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
             if (menuItem.itemId == R.id.nav_settings) {
-                val action = HomeFragmentDirections.actionNavHomeToNavSettings()
-                navController.safeNavigate(action)
-
+                when (navController.currentDestination?.id) {
+                    R.id.nav_home -> {
+                        val action = HomeFragmentDirections.actionNavHomeToNavSettings()
+                        navController.safeNavigate(action)
+                    }
+                    R.id.newsFragment -> {
+                        val action = NewsFragmentDirections.actionNewsFragmentToNavSettings()
+                        navController.safeNavigate(action)
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Function not Implemented", Toast.LENGTH_SHORT).show()
             }
             drawerLayout.close()
             true
@@ -158,26 +164,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateData() {
-
-        settingsManager.preferenceDayNightFlow.asLiveData().observe(this) {
-            dayNightMode = it
-        }
         settingsManager.preferenceProfileImageFlow.asLiveData().observe(this) {
-            if (it.equals("")) {
+            if (it.isBlank()) {
+//                profileImage.setImageResource(R.drawable.ic_person)
                 when (this.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
                     Configuration.UI_MODE_NIGHT_YES -> {
                         profileImage.setImageResource(R.drawable.ic_indicator_person)
-                        profileImage.background = imageViewBorder(
-                            borderColor = Color.parseColor(R.color.md_white_1000.toString()),
-                            borderWidthInDp = 2
-                        )
                     }
                     Configuration.UI_MODE_NIGHT_NO -> {
                         profileImage.setImageResource(R.drawable.ic_person)
                     }
                 }
             } else {
-
                 profileImage.setImageURI(Uri.parse(it))
             }
         }
@@ -201,7 +199,11 @@ class MainActivity : AppCompatActivity() {
             .withListener(object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                     val gallery =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                        Intent(Intent.ACTION_OPEN_DOCUMENT,
+                            MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                    gallery.flags = (FLAG_GRANT_READ_URI_PERMISSION
+                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            or FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                     startActivityForResult(gallery, pickImage)
                 }
 
@@ -225,6 +227,9 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
+            if (imageUri == null) return
+            contentResolver.takePersistableUriPermission(imageUri!!,
+                FLAG_GRANT_READ_URI_PERMISSION);
             lifecycleScope.launch {
                 settingsManager.storeUserProfileImage(imageUri.toString(), this@MainActivity)
             }
@@ -261,37 +266,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    // extension function to make a border for image view
-    fun Context.imageViewBorder(
-        borderColor: Int = Color.BLACK,
-        borderWidthInDp: Int = 5,
-    ): ShapeDrawable {
-        // convert dp to equivalent pixels value for border
-        val borderWidthInPixels = borderWidthInDp.dpToPixels(this)
-
-        val shapeDrawable = ShapeDrawable(RectShape())
-
-        // specify the border properties
-        shapeDrawable.paint.apply {
-            color = borderColor
-            style = Paint.Style.STROKE
-            strokeWidth = borderWidthInPixels
-            isAntiAlias = true
-            flags = Paint.ANTI_ALIAS_FLAG
-        }
-
-        // set padding for drawable
-        val padding = (borderWidthInPixels * 2).toInt()
-        shapeDrawable.setPadding(padding, padding, padding, padding)
-
-        // return image view border as shape drawable
-        return shapeDrawable
-    }
-
-
-    // extension function to convert dp to equivalent pixels
-    private fun Int.dpToPixels(context: Context): Float = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
-    )
 }
