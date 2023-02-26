@@ -1,5 +1,5 @@
-# CoinTract
-> _What is the project?_ - The CoinTract project is a project aiming to build a crypto currency app that tracks data in real time and is accessible on a mobile device. It will allow users to keep tracks of crypto assets, markets, exchanges and news. 
+# CoinBuzz
+> _What is the project?_ - The CoinBuzz project is a project aiming to build a crypto currency app that tracks data in real time and is accessible on a mobile device. It will allow users to keep tracks of crypto assets, markets, exchanges and news. 
 
 > _What is the MVP ?_ - The minimal viable product is a crypto currency app that perform a network call using retrofit, parsing JSON data and showing results to user
 
